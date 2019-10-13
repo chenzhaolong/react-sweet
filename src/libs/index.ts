@@ -1,0 +1,3 @@
+function qA() {
+  return 'asdf';
+}
