@@ -1,3 +1,9 @@
 # IDE files
 .idea
 .vscode
+
+# Dependencies
+node_modules
+
+#ouput
+output

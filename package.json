@@ -1,0 +1,34 @@
+{
+  "name": "react-sweet",
+  "version": "0.0.1",
+  "description": "a tool and function lib of react hook",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "example",
+    "test": "test"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:publish": "sh /bin/publish.sh",
+    "build:debug": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chenzhaolong/react-sweet.git"
+  },
+  "keywords": [
+    "react-sweet"
+  ],
+  "author": "dcv",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chenzhaolong/react-sweet/issues"
+  },
+  "homepage": "https://github.com/chenzhaolong/react-sweet#readme",
+  "devDependencies": {
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
+    "typescript": "^3.6.4"
+  }
+}
