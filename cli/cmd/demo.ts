@@ -1,14 +1,14 @@
 interface Demo {
-    a: Number,
-    a1?: String,
-    f: () => String
+  a: number;
+  a1?: string;
+  f: () => string;
 }
 
-function Demo1(): Demo{
-    return {
-        a: 1,
-        f: function(): String{
-            return 'as';
-        }
+function Demo1(): Demo {
+  return {
+    a: 1,
+    f: function(): string {
+      return 'as';
     }
+  };
 }

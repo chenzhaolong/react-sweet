@@ -11,7 +11,20 @@
   "scripts": {
     "build": "tsc",
     "build:publish": "sh /bin/publish.sh",
-    "build:debug": ""
+    "build:debug": "",
+    "eslint": "eslint --ext .tsx,.ts --fix ./src ./cli"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "npm run eslint",
+      "prettier .prettierrc.js --write",
+      "git add"
+    ]
   },
   "repository": {
     "type": "git",
@@ -27,8 +40,21 @@
   },
   "homepage": "https://github.com/chenzhaolong/react-sweet#readme",
   "devDependencies": {
+    "husky": "^3.0.9",
+    "lint-staged": "^9.4.2",
     "react": "^16.8.0",
     "react-dom": "^16.8.0",
     "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.3.3",
+    "@typescript-eslint/parser": "^2.3.3",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-jsx-control-statements": "^2.2.1",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.16.0",
+    "prettier": "^1.18.2"
   }
 }

@@ -1,3 +1,3 @@
-function A (a: String): String {
-    return a;
+function A(a: string): string {
+  return a;
 }
