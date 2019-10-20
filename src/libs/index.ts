@@ -1,3 +1,0 @@
-function qA() {
-  return 'asdf';
-}

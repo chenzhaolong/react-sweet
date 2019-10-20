@@ -1,0 +1,22 @@
+{
+  "presets": [
+    "env",
+    "react"
+  ],
+  "plugins": [
+    "transform-object-rest-spread",
+    "transform-async-to-generator",
+    "transform-decorators-legacy",
+    "transform-class-properties",
+    "syntax-dynamic-import",
+    [
+      "transform-runtime",
+      {
+        "helpers": false,
+        "polyfill": false,
+        "regenerator": true,
+        "moduleName": "babel-runtime"
+      }
+    ]
+  ]
+}

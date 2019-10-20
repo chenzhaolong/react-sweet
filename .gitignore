@@ -9,4 +9,5 @@ node_modules
 output
 
 #other
-example
+example/node_modules
+example/react-sweet
