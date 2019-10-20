@@ -1,2 +1,2 @@
 # react-sweet
-基于react hook的函数库以及工具库
+基于react hook的函数库以及工具库（开发中）
