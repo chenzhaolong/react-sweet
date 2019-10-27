@@ -11,6 +11,10 @@ interface Params {
   clean?(): void;
 }
 
+/**
+ * @params cb {Function | Object}
+ * return void
+ */
 function useMount(cb: () => any | Params) {
   useEffect(() => {
     if (typeof cb === 'function') {
@@ -18,9 +22,12 @@ function useMount(cb: () => any | Params) {
     } else {
       if (hasProperty(cb, 'mount', 'function')) {
         const mount: () => any = cb['mount'];
-        const clean: () => void = cb['clean'];
         mount();
-        return clean ? clean : () => {};
+        if (hasProperty(cb, 'clean', 'function')) {
+          const clean: () => any = cb['clean'];
+          return clean;
+        }
+        return () => {};
       } else {
         error('options of useMount must has property of mount!');
       }

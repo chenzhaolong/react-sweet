@@ -4,13 +4,13 @@
 
 import React, {Component} from 'react';
 import {render} from 'react-dom';
-import {CheckMountCom} from './lifecycle/exma';
+import {CheckMountCom, Life} from './lifecycle/exma';
 
 class App extends Component {
   render() {
     return (
       <div>
-        <CheckMountCom />
+        <Life />
       </div>
     )
   }
