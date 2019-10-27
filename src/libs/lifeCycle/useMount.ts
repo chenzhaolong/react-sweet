@@ -11,10 +11,6 @@ interface Params {
   clean?(): void;
 }
 
-/**
- * @params cb {Function | Object}
- * return void
- */
 function useMount(cb: () => any | Params) {
   useEffect(() => {
     if (typeof cb === 'function') {

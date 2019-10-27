@@ -1,6 +1,7 @@
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const watch = require('gulp-watch');
+const plumber = require('gulp-plumber');
 const tsConfig = require('./tsconfig');
 //
 // 修改tsConfig的输出地址
@@ -14,12 +15,14 @@ function w(path, task){
 
 gulp.task('compilerSrc', () => {
   const tsResult = gulp.src("src/**/*.ts")
+    .pipe(plumber())
     .pipe(ts(tsConfig.compilerOptions));
   return tsResult.js.pipe(gulp.dest('example/react-sweet/src'));
 });
 
 gulp.task('compilerCli', () => {
   const tsResult = gulp.src("cli/**/*.ts")
+    .pipe(plumber())
     .pipe(ts(tsConfig.compilerOptions));
   return tsResult.js.pipe(gulp.dest('example/react-sweet/cli'));
 });

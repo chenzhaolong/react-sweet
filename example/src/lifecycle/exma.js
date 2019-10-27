@@ -2,8 +2,8 @@
  * @file check life cycle hooks
  */
 
-import React, { Component, useState } from 'react';
-import {useMount, useUpdate, useUpdates} from '../../react-sweet/src/index';
+import React, { Component, useEffect, useState } from 'react';
+import {useMount, useUpdate, useUpdates, useDestroy, useLifeStatus} from '../../react-sweet/src/index';
 
 export class Life extends Component {
   state = {
@@ -69,14 +69,14 @@ function CheckMountHandleAjax(props) {
       timeout = setTimeout(() => {
         setData('end');
       }, 1000)
-    },
-    clean() {
-      if (timeout) {
-        console.log('timeout', timeout)
-        clearTimeout(timeout)
-      }
     }
   })
+  useDestroy(() => {
+    if (timeout) {
+      console.log('timeout', timeout)
+      clearTimeout(timeout)
+    }
+  });
   return <div>
     <p>{data}</p>
   </div>
@@ -120,6 +120,10 @@ function CheckUpdateComs() {
       deps: [a2]
     }
   ]);
+  const status = useLifeStatus();
+  useEffect(() => {
+    console.log('status', status);
+  });
   return <div>
     <button onClick={() => {
       setData(val => val + 1)
