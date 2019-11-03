@@ -2,7 +2,7 @@
  * @file this function can return a promise that can touch the section in
  * lifeCycle in a component.
  * eg:
- *    useLifeCycle().mount(cb).update(cb, deps).destroy(cb)
+ *    useLifeCycle([deps]).mount(cb).update(cb).destroy(cb)
  */
 import { useMemo } from 'react';
 import { useMount, useUpdate } from '../../index';
