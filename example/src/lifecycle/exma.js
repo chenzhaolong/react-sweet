@@ -2,8 +2,8 @@
  * @file check life cycle hooks
  */
 
-import React, { Component, useEffect, useState } from 'react';
-import {useMount, useUpdate, useUpdates, useDestroy, useLifeStatus} from '../../react-sweet/src/index';
+import React, { Component, useEffect, useState, useMemo } from 'react';
+import {useMount, useUpdate, useUpdates, useDestroy, useLifeStatus, useLifeCycle} from '../../react-sweet/src/index';
 
 export class Life extends Component {
   state = {
@@ -36,6 +36,7 @@ export class Life extends Component {
         }
         <CheckUpdateCom />
         <CheckUpdateComs />
+        <CheckLifeCycle />
       </div>
     )
   }
@@ -76,6 +77,10 @@ function CheckMountHandleAjax(props) {
       console.log('timeout', timeout)
       clearTimeout(timeout)
     }
+  });
+  const status = useLifeStatus();
+  useEffect(() => {
+    console.log('CheckMountHandleAjax', status);
   });
   return <div>
     <p>{data}</p>
@@ -129,7 +134,7 @@ function CheckUpdateComs() {
   console.log('update', a1)
   const status = useLifeStatus();
   useEffect(() => {
-    console.log('status', status);
+    console.log('CheckUpdateComs', status);
   });
   return <div>
     <button onClick={() => {
@@ -141,4 +146,20 @@ function CheckUpdateComs() {
       })
     }}>改变a2</button>
   </div>
+}
+
+// 测试useLifeCycle
+function CheckLifeCycle() {
+  const [life1, setLife] = useState(10);
+  const life = useLifeCycle([life1]);
+  life.mount(() => {
+    console.log('life1', life1)
+  }).update(() => {
+    console.log('update', life1)
+  });
+  return <p>
+    <button onClick={() => {
+      setLife(val => val + 20)
+    }}>改变生命周期</button>
+  </p>
 }
