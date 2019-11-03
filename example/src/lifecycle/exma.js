@@ -89,7 +89,7 @@ function CheckUpdateCom() {
   useUpdate(() => {
     console.log('data', data);
     console.log('data1', data1);
-  }, [data, data1]);
+  }, [data]);
   return <div>
     <button onClick={() => {
       setData(val => val + 1)
@@ -118,8 +118,15 @@ function CheckUpdateComs() {
         console.log('a2', a2);
       },
       deps: [a2]
+    },
+    {
+      update() {
+        setData(10);
+      },
+      deps: [a1]
     }
   ]);
+  console.log('update', a1)
   const status = useLifeStatus();
   useEffect(() => {
     console.log('status', status);

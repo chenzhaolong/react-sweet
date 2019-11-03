@@ -18,13 +18,9 @@ function useUpdates(options: Array<Option> | Option) {
       useUpdate(item.update, item.deps);
     });
   } else if (typeof options === 'object') {
-    // @ts-ignore
-    const cb: () => any = options['update'];
-    // @ts-ignore
-    const deps: Array<any> = options['deps'];
-    useUpdate(cb, deps);
+    error('the input is object, maybe you can use the hook of useUpdate');
   } else {
-    error('the input in useUpdates must be array or object');
+    error('the input in useUpdates must be array');
   }
 }
 
