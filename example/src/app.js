@@ -4,7 +4,7 @@
 
 import React, {Component} from 'react';
 import {render} from 'react-dom';
-import {CheckMountCom, Life} from './lifecycle/exma';
+import {Life} from './lifecycle/exma';
 
 class App extends Component {
   render() {
