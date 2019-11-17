@@ -2,7 +2,7 @@
  * @file the dynamic css style
  */
 import { useMemo } from 'react';
-import { error } from '../../utils/log';
+import { error, warning } from '../../utils/log';
 import { hasProperty } from '../../utils/tools';
 
 function handleByObject(originStyle: object, mapping: object): object {
@@ -23,7 +23,13 @@ function useStyle(style: object, second?: any, deps?: Array<any>): object {
     if (second && typeof second === 'object') {
       return handleByObject(style, second);
     } else if (second && typeof second === 'function') {
-      return second(style);
+      const handleStyle = second(style);
+      if (handleStyle) {
+        return handleStyle;
+      } else {
+        warning('if the second params is function, please make the function has return in the useStyle.');
+        return {};
+      }
     } else {
       error('the second params of useStyle must be object or function');
       return {};

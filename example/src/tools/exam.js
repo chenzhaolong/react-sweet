@@ -9,13 +9,14 @@ export class Tools extends Component {
   state = {
     mode: 'add',
     id: 1
-  }
+  };
 
   render() {
     return (
       <div>
         <SetPageTitle title='任意'/>
         <CheckTheStyle mode={this.state.mode} />
+        <CheckTheStyleByFunc mode={this.state.mode} id={this.state.id} />
         <button onClick={() => {
           this.setState({id: this.state.id + 1})
         }}>改变id-{this.state.id}</button>
@@ -44,6 +45,7 @@ function SetPageTitle(props) {
 
 // check the useStyle
 function CheckTheStyle(props) {
+  console.log('env', process.env.NODE_ENV)
   const {mode} = props;
   const style = useStyle({
     add: {
@@ -57,5 +59,25 @@ function CheckTheStyle(props) {
   }, {add: mode === 'add', edit: mode === 'edit'}, [mode]);
   return <div>
     <span style={style}>测试useStyle</span>
+  </div>
+}
+
+// check the useStyle by function params
+function CheckTheStyleByFunc(props) {
+  const {mode, id} = props;
+  const style = useStyle({ fontSize: '16px', color: 'blue' }, (style) => {
+    if (id >= 5 && id < 10) {
+      return style;
+    } else if (id < 5){
+       style.color = 'red';
+       return style;
+    } else {
+      // return {
+      //   color: 'green'
+      // }
+    }
+  }, [id]);
+  return <div>
+    <span style={style}>测试useStyle的function模式</span>
   </div>
 }
