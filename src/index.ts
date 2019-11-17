@@ -23,4 +23,4 @@ export { default as useFor } from './libs/tools/useFor';
 export { default as usePerformance } from './libs/tools/usePerformance';
 export { default as useData } from './libs/tools/useData';
 export { default as useLog } from './libs/tools/useLog';
-export { default as useRef } from './libs/tools/useRef';
+export { default as useCondition } from './libs/tools/useCondition';
