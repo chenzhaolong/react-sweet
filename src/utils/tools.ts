@@ -35,3 +35,17 @@ export function isArray(array: any): boolean {
     return Object.prototype.toString.call(array) === '[object, Array]';
   }
 }
+
+/**
+ * judge the func has return
+ * @param {Function} func function
+ * @param {any} params the input of function
+ * @return {boolean}
+ */
+export function hasReturnValue(func: (param?: any) => any, params: any): boolean {
+  if (typeof func !== 'function') {
+    return false;
+  }
+  const result = func(params);
+  return result && true;
+}

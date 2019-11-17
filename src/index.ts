@@ -19,7 +19,7 @@ export { default as useDebounce } from './libs/tools/useDebounce';
 export { default as useComputed } from './libs/tools/useComputed';
 export { default as useKey } from './libs/tools/useKey';
 export { default as useStyle } from './libs/tools/useStyle';
-export { default as useHoc } from './libs/tools/useHoc';
+export { default as useFor } from './libs/tools/useFor';
 export { default as usePerformance } from './libs/tools/usePerformance';
 export { default as useData } from './libs/tools/useData';
 export { default as useLog } from './libs/tools/useLog';

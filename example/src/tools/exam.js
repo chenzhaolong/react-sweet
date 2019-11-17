@@ -3,32 +3,50 @@
  */
 
 import React, { Component, useState } from 'react';
-import { useTitle, useStyle, useComputed } from '../../react-sweet/src';
+import { useTitle, useStyle, useComputed, useFor } from '../../react-sweet/src';
 
 export class Tools extends Component {
   state = {
     mode: 'add',
     id: 1,
-    date: Date.now()
+    date: Date.now(),
+    list: [
+      {a1: 'a', a2: 'b', a3: 'c'},
+      {a1: 'a1', a2: 'b1', a3: 'c1'},
+      {a1: 'a2', a2: 'b2', a3: 'c2'},
+      {a1: 'a3', a2: 'b3', a3: 'c3'},
+      {a1: 'a4', a2: 'b4', a3: 'c4'},
+    ]
   };
 
   render() {
     return (
       <div>
-        <SetPageTitle title='任意'/>
-        <CheckTheStyle mode={this.state.mode} />
-        <CheckTheStyleByFunc mode={this.state.mode} id={this.state.id} />
+        {/*<SetPageTitle title='任意'/>*/}
+        {/*<CheckTheStyle mode={this.state.mode} />*/}
+        {/*<CheckTheStyleByFunc mode={this.state.mode} id={this.state.id} />*/}
+        {/*<button onClick={() => {*/}
+        {/*  this.setState({id: this.state.id + 1})*/}
+        {/*}}>改变id-{this.state.id}</button>*/}
+        {/*<button onClick={() => {*/}
+        {/*  this.setState({mode: this.state.mode === 'add' ? 'edit' : 'add'})*/}
+        {/*}}>改变模式</button>*/}
+        {/*<button onClick={() => {*/}
+        {/*  this.setState({date: Date.now()})*/}
+        {/*}}>改变日期</button>*/}
+
+        {/*<ComputedValue id={this.state.id} mode={this.state.mode} date={this.state.date} />*/}
+
+        <TableList list={this.state.list} />
+        <ListItem list={this.state.list} />
         <button onClick={() => {
-          this.setState({id: this.state.id + 1})
-        }}>改变id-{this.state.id}</button>
-        <button onClick={() => {
-          this.setState({mode: this.state.mode === 'add' ? 'edit' : 'add'})
-        }}>改变模式</button>
+          const list = [].concat(this.state.list);
+          list.push({a1: 'a', a2: 'b', a3: 'c'});
+          this.setState({list: list})
+        }}>改变列表</button>
         <button onClick={() => {
           this.setState({date: Date.now()})
         }}>改变日期</button>
-
-        <ComputedValue id={this.state.id} mode={this.state.mode} date={this.state.date} />
       </div>
     );
   }
@@ -117,4 +135,36 @@ function ComputedValue(props) {
     <p>val3: {val3}</p>
     <p>{mode}</p>
   </div>)
+}
+
+class TableList extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log('update')
+  }
+
+  render() {
+    return (
+      <div>
+        {
+          this.props.list.map((item, index) => {
+            return <p key={index}>{item.a1}</p>
+          })
+        }
+      </div>
+    )
+  }
+}
+
+function ListItem(props) {
+  return useFor({
+    source: props.list,
+    render(item, index) {
+      console.log('update1');
+      return <p key={index}>{item.a2}</p>
+    }
+  })
 }
