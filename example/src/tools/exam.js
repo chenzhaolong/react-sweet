@@ -3,12 +3,13 @@
  */
 
 import React, { Component, useState } from 'react';
-import { useTitle, useStyle } from '../../react-sweet/src';
+import { useTitle, useStyle, useComputed } from '../../react-sweet/src';
 
 export class Tools extends Component {
   state = {
     mode: 'add',
-    id: 1
+    id: 1,
+    date: Date.now()
   };
 
   render() {
@@ -23,6 +24,11 @@ export class Tools extends Component {
         <button onClick={() => {
           this.setState({mode: this.state.mode === 'add' ? 'edit' : 'add'})
         }}>改变模式</button>
+        <button onClick={() => {
+          this.setState({date: Date.now()})
+        }}>改变日期</button>
+
+        <ComputedValue id={this.state.id} mode={this.state.mode} date={this.state.date} />
       </div>
     );
   }
@@ -80,4 +86,35 @@ function CheckTheStyleByFunc(props) {
   return <div>
     <span style={style}>测试useStyle的function模式</span>
   </div>
+}
+
+// check the useComputed
+function ComputedValue(props) {
+  const {mode, id, date} = props;
+  const {val1, val2, val3} = useComputed([
+    {
+      val1() {
+        console.log('val1')
+        return `id-${id}`
+      },
+      deps: [id]
+    },
+    {
+      val2() {
+        console.log('val2')
+        return `date-${date}`
+      },
+      val3() {
+        console.log('val3')
+        return `id和date-${id}:${date}`
+      },
+      deps: [date]
+    }
+  ])
+  return (<div>
+    <p>val1: {val1}</p>
+    <p>val2: {val2}</p>
+    <p>val3: {val3}</p>
+    <p>{mode}</p>
+  </div>)
 }
