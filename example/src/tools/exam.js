@@ -19,6 +19,10 @@ export class Tools extends Component {
     ]
   };
 
+  onClick = (item) => {
+    console.log('item', item)
+  }
+
   render() {
     return (
       <div>
@@ -38,7 +42,7 @@ export class Tools extends Component {
         {/*<ComputedValue id={this.state.id} mode={this.state.mode} date={this.state.date} />*/}
 
         <TableList list={this.state.list} />
-        <ListItem list={this.state.list} />
+        <ListItem list={this.state.list} click={this.onClick}/>
         <button onClick={() => {
           const list = [].concat(this.state.list);
           list.push({a1: 'a', a2: 'b', a3: 'c'});
@@ -164,7 +168,10 @@ function ListItem(props) {
     source: props.list,
     render(item, index) {
       console.log('update1');
-      return <p key={index}>{item.a2}</p>
+      const click = () => {
+        props.click && props.click(item)
+      }
+      return <p key={index} onClick={click}>{item.a2}</p>
     }
   })
 }

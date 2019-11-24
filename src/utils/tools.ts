@@ -32,7 +32,7 @@ export function isArray(array: any): boolean {
   if (Array.isArray && typeof Array.isArray === 'function') {
     return Array.isArray(array);
   } else {
-    return Object.prototype.toString.call(array) === '[object, Array]';
+    return Object.prototype.toString.call(array) === '[object Array]';
   }
 }
 
@@ -48,4 +48,35 @@ export function hasReturnValue(func: (param?: any) => any, params: any): boolean
   }
   const result = func(params);
   return result && true;
+}
+
+/**
+ * judge the type of value
+ * @param {string} type
+ * @param {any} value
+ * @return boolean
+ */
+export function isType(type: string, value: any): boolean {
+  if (!type) {
+    return false;
+  }
+  let targetType = '';
+  switch (type) {
+    case 'object':
+      targetType = '[object Object]';
+      break;
+    case 'array':
+      targetType = '[object Array]';
+      break;
+    case 'boolean':
+      targetType = '[object Boolean]';
+      break;
+    case 'string':
+      targetType = '[object String]';
+      break;
+    default:
+      targetType = '[object undefined]';
+      break;
+  }
+  return Object.prototype.toString.call(value) === targetType;
 }

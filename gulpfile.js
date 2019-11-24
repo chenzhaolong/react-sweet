@@ -21,15 +21,15 @@ gulp.task('compilerSrc', () => {
 });
 
 gulp.task('compilerCli', () => {
-  const tsResult = gulp.src("cli/**/*.ts")
+  const tsResult = gulp.src("command/**/*.ts")
     .pipe(plumber())
     .pipe(ts(tsConfig.compilerOptions));
-  return tsResult.js.pipe(gulp.dest('example/react-sweet/cli'));
+  return tsResult.js.pipe(gulp.dest('example/react-sweet/command'));
 });
 
 gulp.task('watch', () => {
   w('src/**/*.ts', 'compilerSrc');
-  w('cli/**/*.ts', 'compilerCli');
+  w('command/**/*.ts', 'compilerCli');
 });
 
 gulp.task('compiler', ['compilerSrc', 'compilerCli', 'watch']);

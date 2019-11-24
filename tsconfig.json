@@ -14,12 +14,12 @@
      "moduleResolution": "node",
      "rootDirs": [
        "src",
-       "cli"
+       "command"
      ],
     "esModuleInterop": true
   },
   "include": [
-    "cli/**/*",
+    "command/**/*",
     "src/**/*"
   ],
   "exclude": [
