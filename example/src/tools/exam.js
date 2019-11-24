@@ -2,8 +2,8 @@
  * @file check the tool of hooks
  */
 
-import React, { Component, useState } from 'react';
-import { useTitle, useStyle, useComputed, useFor } from '../../react-sweet/src';
+import React, { Component, useEffect, useState } from 'react';
+import { useTitle, useStyle, useComputed, useFor, useData } from '../../react-sweet/src';
 
 export class Tools extends Component {
   state = {
@@ -51,6 +51,8 @@ export class Tools extends Component {
         <button onClick={() => {
           this.setState({date: Date.now()})
         }}>改变日期</button>
+
+        <ChangeValue />
       </div>
     );
   }
@@ -174,4 +176,31 @@ function ListItem(props) {
       return <p key={index} onClick={click}>{item.a2}</p>
     }
   })
+}
+
+// check the useData
+function ChangeValue() {
+  const {data, changeData} = useData({a: {b: 1, c: {d: 3}}, e: {a: 4}});
+  useEffect(() => {
+    console.log('data', data)
+  })
+  return (
+    <div>
+      <button onClick={() => {
+        changeData('a.c.d', 'shide')
+      }}>修改a.c.d</button>
+
+      <button onClick={() => {
+        changeData('a.b', 123)
+      }}>修改a.b</button>
+
+      <button onClick={() => {
+        changeData('a.c', {d: 3})
+      }}>修改a.c</button>
+
+      <button onClick={() => {
+        changeData('a.e.b', {g: 122})
+      }}>添加a.b</button>
+    </div>
+  )
 }

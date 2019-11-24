@@ -80,3 +80,12 @@ export function isType(type: string, value: any): boolean {
   }
   return Object.prototype.toString.call(value) === targetType;
 }
+
+/**
+ * get the type of value
+ * @param {any} value
+ * @return {string}
+ */
+export function getType(value: any) {
+  return Object.prototype.toString.call(value);
+}
