@@ -3,7 +3,9 @@
  */
 
 import React, { Component, useEffect, useState } from 'react';
-import { useTitle, useStyle, useComputed, useFor, useData } from '../../react-sweet/src';
+import { useTitle, useStyle, useComputed, useFor, useData, createContext } from '../../react-sweet/src';
+
+const context = createContext();
 
 export class Tools extends Component {
   state = {
@@ -53,6 +55,8 @@ export class Tools extends Component {
         }}>改变日期</button>
 
         <ChangeValue />
+
+        <A1/>
       </div>
     );
   }
@@ -201,6 +205,35 @@ function ChangeValue() {
       <button onClick={() => {
         changeData('a.e.b', {g: 122})
       }}>添加a.b</button>
+    </div>
+  )
+}
+
+function A1(props) {
+  context.useSend('A1', {a: 1, b: 2});
+  return (
+    <div>
+      <A2/>
+    </div>
+  )
+}
+
+function A2(props) {
+  return (
+    <div>
+      <A3/>
+    </div>
+  )
+}
+
+function A3(props) {
+  const value = context.useReceive();
+  useEffect(() => {
+    console.log('value', value)
+  })
+  return (
+    <div>
+      来自A1的属性
     </div>
   )
 }
