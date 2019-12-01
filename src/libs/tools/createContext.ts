@@ -2,25 +2,50 @@
  * @file the context of react hook
  */
 import { useCallback, useEffect } from 'react';
+import { isFunction } from 'lodash';
+import { hasProperty } from '../../utils/tools';
+
+type TempZone = {
+  [key: string]: any;
+};
+
+type Events = {
+  [key: string]: Array<any>;
+};
 
 class ContextEvent {
-  events: object;
+  events: Events;
+  tempZone: TempZone;
+
   constructor() {
     this.events = {};
+    this.tempZone = {}; // temporary data for invoke the listener function
   }
 
   publish(name: string, data: any): void {
     const eventNames = Object.keys(this.events);
-    if (eventNames.indexOf(name) !== -1) {
-      // @ts-ignore
-      this.events[name].shift();
-      // @ts-ignore
-      this.events[name].push(data);
+    if (eventNames.indexOf(name) !== -1 && this.events[name].length > 0) {
+      this.events[name].forEach((fn) => {
+        isFunction(fn) && fn(data);
+      });
     } else {
-      // @ts-ignore
+      this.tempZone[name] = data;
+    }
+  }
+
+  listener(name: string, cb: (value: any) => any) {
+    if (hasProperty(this.tempZone, name)) {
+      cb(this.tempZone[name]);
+      delete this.tempZone[name];
+    }
+
+    const eventNames = Object.keys(this.events);
+    if (eventNames.indexOf(name) !== -1) {
+      this.events[name].shift();
+      this.events[name].push(cb);
+    } else {
       this.events[name] = [];
-      // @ts-ignore
-      this.events[name].push(data);
+      this.events[name].push(cb);
     }
   }
 }
@@ -28,16 +53,16 @@ class ContextEvent {
 function createContext() {
   const context = new ContextEvent();
   return {
-    useSend(name: string, prop: any) {
+    useSend(name: string, prop: any, deps?: Array<any>) {
       useEffect(() => {
         context.publish(name, prop);
-      }, [prop]);
+      }, deps);
     },
-    useReceive(): any {
-      const events = useCallback(() => {
-        return context.events;
+    useReceive(name: string, callback: () => any): any {
+      const events = useCallback((callback) => {
+        context.listener(name, callback);
       }, []);
-      return events();
+      return events(callback);
     }
   };
 }

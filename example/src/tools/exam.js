@@ -6,6 +6,7 @@ import React, { Component, useEffect, useState } from 'react';
 import { useTitle, useStyle, useComputed, useFor, useData, createContext } from '../../react-sweet/src';
 
 const context = createContext();
+const context1 = createContext();
 
 export class Tools extends Component {
   state = {
@@ -56,7 +57,7 @@ export class Tools extends Component {
 
         <ChangeValue />
 
-        <A1/>
+        <A1 date={this.state.date}/>
       </div>
     );
   }
@@ -210,7 +211,8 @@ function ChangeValue() {
 }
 
 function A1(props) {
-  context.useSend('A1', {a: 1, b: 2});
+  // context.useSend('A1', {a: props.date}, [props.date]);
+  context1.useSend('A1', {a: props.date}, [props.date]);
   return (
     <div>
       <A2/>
@@ -227,13 +229,14 @@ function A2(props) {
 }
 
 function A3(props) {
-  const value = context.useReceive();
-  useEffect(() => {
-    console.log('value', value)
-  })
+  const [A, setA] = useState({});
+  context1.useReceive('A1', (value) => {
+    console.log('change');
+    setA(value);
+  });
   return (
     <div>
-      来自A1的属性
+      来自A1的属性{A.a}
     </div>
   )
 }
