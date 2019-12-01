@@ -6,6 +6,7 @@ import React, {Component} from 'react';
 import {render} from 'react-dom';
 import {Life} from './lifecycle/exma';
 import {Tools} from './tools/exam';
+import {Native} from './native/exam';
 
 class App extends Component {
   render() {
