@@ -13,7 +13,8 @@ class App extends Component {
     return (
       <div>
         {/*<Life />*/}
-        <Tools />
+        {/*<Tools />*/}
+        <Native />
       </div>
     )
   }

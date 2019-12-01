@@ -7,7 +7,7 @@ import { hasProperty, isArray } from '../../utils/tools';
 import { isString } from 'lodash';
 
 interface Options {
-  times: number;
+  time: number;
   type: string;
 }
 
@@ -60,8 +60,8 @@ function checkOptions(options: Options): boolean {
     return false;
   }
 
-  if (!hasProperty(options, 'type') || !hasProperty(options, 'times')) {
-    error('the second params of useFn must has the property of "times" and "type"!');
+  if (!hasProperty(options, 'type') || !hasProperty(options, 'time')) {
+    error('the second params of useFn must has the property of "time" and "type"!');
     return false;
   }
 
@@ -84,7 +84,7 @@ function useFn(cb: () => any, options: Options, deps: Array<any> | string) {
     fn = debounce;
   }
 
-  const realDeps: Array<any> = [options.times];
+  const realDeps: Array<any> = [options.time];
   if (deps && isArray(deps)) {
     realDeps.concat(deps);
   } else if (deps && isString(deps)) {
@@ -92,7 +92,7 @@ function useFn(cb: () => any, options: Options, deps: Array<any> | string) {
   }
 
   return useMemo(() => {
-    return fn(cb, options.times);
+    return fn(cb, options.time);
   }, realDeps);
 }
 
