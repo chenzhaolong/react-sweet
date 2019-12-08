@@ -2,7 +2,7 @@
  * @file check the native of hooks
  */
 import React, {Component, useEffect, useState} from 'react'
-import {useFn, useResize, useOffset} from '../../react-sweet/src';
+import {useFn, useResize, useOffset, usePromise} from '../../react-sweet/src';
 
 export class Native extends Component {
   state = {
@@ -15,6 +15,7 @@ export class Native extends Component {
         {/*<CheckFn />*/}
         <CheckOnresize />
         <CheckOffset id={this.state.changeId} />
+        <CheckPromise />
         <button onClick={(e) => {
           this.setState({changeId: this.state.changeId + 1})
         }}>change</button>
@@ -71,4 +72,22 @@ function CheckOffset(props) {
       <li>offsetHeight-{offset.offsetHeight}</li>
     </div>
   )
+}
+
+function CheckPromise(props) {
+  const {status, data} = usePromise(becomePromise);
+  useEffect(() => {
+    console.log('data', data)
+  });
+  return <div>
+    答案：{status === 'success' ? data.a1 : ''}
+  </div>
+}
+
+function becomePromise() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve({a1: 12})
+    }, 1000)
+  });
 }

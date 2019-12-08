@@ -74,6 +74,9 @@ export function isType(type: string, value: any): boolean {
     case 'string':
       targetType = '[object String]';
       break;
+    case 'function':
+      targetType = '[object Function]';
+      break;
     default:
       targetType = '[object undefined]';
       break;
@@ -88,4 +91,13 @@ export function isType(type: string, value: any): boolean {
  */
 export function getType(value: any) {
   return Object.prototype.toString.call(value);
+}
+
+/**
+ * judge the fn is Promise
+ * @param {any} fn
+ * @return {boolean}
+ */
+export function isPromise(fn: any): boolean {
+  return fn.then && isType('function', fn.then);
 }

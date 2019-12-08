@@ -22,5 +22,5 @@ export { default as useCondition } from './libs/tools/useCondition';
 /* native */
 export { default as useFn } from './libs/native/useFn';
 export { default as useResize } from './libs/native/useResize';
-export { default as useViewSize } from './libs/native/useViewSize';
+export { default as usePromise } from './libs/native/usePromise';
 export { default as useOffset } from './libs/native/useOffset';
