@@ -2,13 +2,14 @@
  * @file check the native of hooks
  */
 import React, {Component, useEffect} from 'react'
-import {useFn} from '../../react-sweet/src';
+import {useFn, useResize} from '../../react-sweet/src';
 
 export class Native extends Component {
   render() {
     return (
       <div>
-        <CheckFn />
+        {/*<CheckFn />*/}
+        <CheckOnresize />
       </div>
     )
   }
@@ -26,12 +27,21 @@ function CheckFn(props) {
 
   useEffect(() => {
     window.onresize = function(e) {
-      console.log('e', e);
+      // console.log('e', e);
       fn(e);
       fn1(e);
     };
   });
   return (
     <div>null</div>
+  )
+}
+
+function CheckOnresize(props) {
+  useResize((e) => {
+    console.log('onSize', e);
+  });
+  return (
+    <div>resize</div>
   )
 }
