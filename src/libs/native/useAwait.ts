@@ -1,7 +1,7 @@
 /**
  * @file let the hook become promise
  */
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { isPromise } from '../../utils/tools';
 import { error } from '../../utils/log';
 
@@ -16,7 +16,7 @@ interface Result {
   data: any;
 }
 
-function usePromise(callback: any, deps?: Array<any>): Result {
+function useAwait(callback: any, deps?: Array<any>): Result {
   const [data, setData] = useState({ status: Status.Wait, data: {} });
   const realDeps = deps ? deps : [];
   useMemo(() => {
@@ -43,4 +43,4 @@ function usePromise(callback: any, deps?: Array<any>): Result {
   return data;
 }
 
-export default usePromise;
+export default useAwait;

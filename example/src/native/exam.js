@@ -2,7 +2,7 @@
  * @file check the native of hooks
  */
 import React, {Component, useEffect, useState} from 'react'
-import {useFn, useResize, useOffset, usePromise} from '../../react-sweet/src';
+import {useFn, useResize, useOffset, useAwait} from '../../react-sweet/src';
 
 export class Native extends Component {
   state = {
@@ -75,7 +75,7 @@ function CheckOffset(props) {
 }
 
 function CheckPromise(props) {
-  const {status, data} = usePromise(becomePromise);
+  const {status, data} = useAwait(becomePromise);
   useEffect(() => {
     console.log('data', data)
   });
