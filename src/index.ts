@@ -24,3 +24,6 @@ export { default as useFn } from './libs/native/useFn';
 export { default as useResize } from './libs/native/useResize';
 export { default as useAwait } from './libs/native/useAwait';
 export { default as useOffset } from './libs/native/useOffset';
+
+/* async */
+export { default as useFetchForMount } from './libs/async/useFetchForMount';

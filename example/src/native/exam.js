@@ -15,7 +15,7 @@ export class Native extends Component {
         {/*<CheckFn />*/}
         <CheckOnresize />
         <CheckOffset id={this.state.changeId} />
-        <CheckPromise />
+        <CheckPromise id={this.state.changeId} />
         <button onClick={(e) => {
           this.setState({changeId: this.state.changeId + 1})
         }}>change</button>
@@ -75,7 +75,9 @@ function CheckOffset(props) {
 }
 
 function CheckPromise(props) {
-  const {status, data} = useAwait(becomePromise);
+  const {status, data} = useAwait(() => {
+    return becomePromise(props.id)
+  }, [props.id]);
   useEffect(() => {
     console.log('data', data)
   });
@@ -84,10 +86,10 @@ function CheckPromise(props) {
   </div>
 }
 
-function becomePromise() {
+function becomePromise(id) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve({a1: 12})
+      resolve({a1: id})
     }, 1000)
   });
 }

@@ -7,6 +7,7 @@ import {render} from 'react-dom';
 import {Life} from './lifecycle/exma';
 import {Tools} from './tools/exam';
 import {Native} from './native/exam';
+import {Async} from './async/exam';
 
 class App extends Component {
   render() {
@@ -15,6 +16,7 @@ class App extends Component {
         {/*<Life />*/}
         {/*<Tools />*/}
         <Native />
+        <Async />
       </div>
     )
   }
