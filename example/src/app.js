@@ -23,3 +23,7 @@ class App extends Component {
 }
 
 render(<App/>, document.getElementById('app'));
+
+usePromiseAll([
+  {fetch: promise, handle: (data) => {}}
+]);
