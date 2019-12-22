@@ -3,7 +3,7 @@
  */
 
 import React, { Component, useEffect, useState } from 'react';
-import { useTitle, useStyle, useComputed, useFor, useData, createContext } from '../../react-sweet/src';
+import { useTitle, useStyle, useComputed, useFor, useData, createContext, useLogic } from '../../react-sweet/src';
 
 const context = createContext();
 const context1 = createContext();
@@ -56,6 +56,8 @@ export class Tools extends Component {
         }}>改变日期</button>
 
         <ChangeValue />
+
+        <CheckLogic id={this.state.id} />
 
         <A1 date={this.state.date}/>
       </div>
@@ -239,4 +241,16 @@ function A3(props) {
       来自A1的属性{A.a}
     </div>
   )
+}
+
+function CheckLogic(props) {
+  const {value, trigger} = useLogic(props.id, (val, a, b) => {
+    console.log(b);
+    return val + a + b
+  });
+  return <div>
+    <button onClick={() => {
+      trigger(1, 2);
+    }}>click logic - {value}</button>
+  </div>
 }

@@ -14,9 +14,9 @@ class App extends Component {
     return (
       <div>
         {/*<Life />*/}
-        {/*<Tools />*/}
-        <Native />
-        <Async />
+        <Tools />
+        {/*<Native />*/}
+        {/*<Async />*/}
       </div>
     )
   }

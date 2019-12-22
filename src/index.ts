@@ -18,6 +18,7 @@ export { default as useFor } from './libs/tools/useFor';
 export { default as useData } from './libs/tools/useData';
 export { default as createContext } from './libs/tools/createContext';
 export { default as useCondition } from './libs/tools/useCondition';
+export { default as useLogic } from './libs/tools/useLogic';
 
 /* native */
 export { default as useFn } from './libs/native/useFn';
