@@ -7,14 +7,19 @@ import { isPromise } from '../../utils/tools';
 import { error } from '../../utils/log';
 
 function useFetchForMount(fetch: any, path?: string, initValue?: any): any {
-  const realInitValue = path ? initValue : '';
+  if (path && !initValue) {
+    error('if the second input exist, the third input must be exist.');
+    return;
+  }
+  const realInitValue = path ? initValue : {};
   const [response, setResponse] = useState(realInitValue);
   useEffect(() => {
-    if (!isPromise(fetch)) {
+    const promise = fetch();
+    if (!isPromise(promise)) {
       error('the input params must be Promise, please make sure your input whether Promise is.');
       return;
     }
-    fetch
+    promise
       .then((data: any) => {
         if (!data) {
           setResponse(realInitValue);

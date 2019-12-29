@@ -14,16 +14,12 @@ class App extends Component {
     return (
       <div>
         {/*<Life />*/}
-        <Tools />
+        {/*<Tools />*/}
         {/*<Native />*/}
-        {/*<Async />*/}
+        <Async />
       </div>
     )
   }
 }
 
 render(<App/>, document.getElementById('app'));
-
-usePromiseAll([
-  {fetch: promise, handle: (data) => {}}
-]);
