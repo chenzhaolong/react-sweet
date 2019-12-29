@@ -2,7 +2,7 @@
  * @file check the async of hooks
  */
 import React, {Component, useEffect, useState} from 'react'
-import {useFetchForMount} from '../../react-sweet/src';
+import {useFetchForMount, useFetchAll} from '../../react-sweet/src';
 
 export class Async extends Component {
   state = {
@@ -12,7 +12,8 @@ export class Async extends Component {
   render() {
     return (
       <div>
-        <CheckMountFetch />
+        {/*<CheckMountFetch />*/}
+        <CheckFetchAll />
       </div>
     )
   }
@@ -21,8 +22,7 @@ export class Async extends Component {
 function fetch (params) {
   return new Promise((res, rej) => {
     setTimeout(() => {
-      console.log('send');
-      return res({data: {a: {b: {c: 10}}}})
+      return res({a: {b: {c: params}},d: params})
     }, 1000);
   })
 }
@@ -38,3 +38,20 @@ function CheckMountFetch (props) {
   </div>
 }
 
+function CheckFetchAll(props) {
+  const data = useFetchAll({
+    apple: fetch(11),
+    banana: fetch(12),
+    orange: fetch(13)
+  }, {
+    apple: {a: {b: ''}},
+    banana: {d: ''},
+    orange: {a: {b: {c: ''}}}
+  });
+  console.log('all', data);
+  return <div>
+    <p>apple: {data.apple.d}</p>
+    <p>banana: {data.banana.d}</p>
+    <p>orange: {data.orange.a.b.c}</p>
+  </div>
+}
