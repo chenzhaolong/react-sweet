@@ -13,7 +13,7 @@ export class Async extends Component {
     return (
       <div>
         {/*<CheckMountFetch />*/}
-        <CheckFetchAll />
+        <CheckFetchAll id={this.state.changeId}/>
       </div>
     )
   }
@@ -47,7 +47,7 @@ function CheckFetchAll(props) {
     apple: {a: {b: ''}},
     banana: {d: ''},
     orange: {a: {b: {c: ''}}}
-  });
+  }, [props.id]);
   console.log('all', data);
   return <div>
     <p>apple: {data.apple.d}</p>

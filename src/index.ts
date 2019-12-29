@@ -29,3 +29,4 @@ export { default as useOffset } from './libs/native/useOffset';
 /* async */
 export { default as useFetchForMount } from './libs/async/useFetchForMount';
 export { default as useFetchAll } from './libs/async/useFetchAll';
+export { default as usePolling } from './libs/async/usePolling';
