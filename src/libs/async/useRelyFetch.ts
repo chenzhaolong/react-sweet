@@ -1,10 +1,11 @@
 /**
  * @file the fetch base on the dependent relationship between two api
+ * todo: 该钩子的调用形式和配置项是否需要进一步优化，特别时when的语境
  */
 import { useState, useCallback } from 'react';
 import { isFunction, get } from 'lodash';
-import { error } from '../../../output/src/utils/log';
-import { isPromise } from '../../../output/src/utils/tools';
+import { error } from '../../utils/log';
+import { isPromise } from '../../utils/tools';
 
 interface Options {
   when: (data: any) => Promise<any>;

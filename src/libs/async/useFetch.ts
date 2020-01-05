@@ -2,7 +2,7 @@
  * @file the ajax hook when user take action
  */
 import { useState, useCallback } from 'react';
-import { isPromise } from '../../../output/src/utils/tools';
+import { isPromise } from '../../utils/tools';
 import { error } from '../../utils/log';
 import { get, isFunction } from 'lodash';
 
