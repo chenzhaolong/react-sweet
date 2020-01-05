@@ -62,19 +62,28 @@ function CheckFetchAll(props) {
 }
 
 function CheckPolling (props) {
-  const {result, start} = usePolling(() => {
-    return fetch('1');
+  const [loading, setLoading] = useState('wait');
+  const {result, start} = usePolling((params) => {
+    return fetch(params);
   }, {
-    terminate(response) {return response.d > 3},
+    terminate(response) {
+      if (response.d > 10) {
+        setLoading('finish');
+        return true
+      } else {
+        return false
+      }
+    },
     timeout: 1000,
     initValue: {a: {b: {c: ''}}}
   });
 
-  useEffect(() => {
-    start()
-  }, []);
-
   return <div>
     <p>结果: {result.a.b.c}</p>
+    <button onClick={e => {
+      setLoading('start');
+      start(0);
+    }} >开始轮询</button>
+    <p>当前状态: {loading}</p>
   </div>
 }
