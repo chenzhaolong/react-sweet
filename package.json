@@ -2,7 +2,7 @@
   "name": "react-sweet",
   "version": "0.0.1",
   "description": "a tool and function lib of react hook",
-  "main": "index.js",
+  "main": "./src/index.js",
   "directories": {
     "doc": "docs",
     "example": "example",
