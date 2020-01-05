@@ -1,7 +1,7 @@
 /**
  * @file check the async of hooks
  */
-import React, {Component, useEffect, useState} from 'react'
+import React, {Component, useEffect, useState, useMemo} from 'react'
 import {useFetchForMount, useFetchAll, usePolling} from '../../react-sweet/src';
 
 export class Async extends Component {
@@ -63,7 +63,7 @@ function CheckFetchAll(props) {
 
 function CheckPolling (props) {
   const [loading, setLoading] = useState('wait');
-  const {result, start} = usePolling((params) => {
+  const {result, start, reset} = usePolling((params) => {
     return fetch(params);
   }, {
     terminate(response) {
@@ -78,10 +78,15 @@ function CheckPolling (props) {
     initValue: {a: {b: {c: ''}}}
   });
 
+  const showData = useMemo(() => {
+    return result.a.b.c === 0 ? 'good' : 'bad'
+  }, [result.a.b.c]);
+
   return <div>
-    <p>结果: {result.a.b.c}</p>
+    <p>结果: {showData}</p>
     <button onClick={e => {
       setLoading('start');
+      reset();
       start(0);
     }} >开始轮询</button>
     <p>当前状态: {loading}</p>

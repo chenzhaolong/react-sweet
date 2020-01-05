@@ -13,6 +13,7 @@ import { isPromise } from '../../utils/tools';
 interface Polling {
   result: any;
   start: (params: any) => any;
+  reset: (initData?: any) => void;
 }
 
 interface Options {
@@ -23,9 +24,10 @@ interface Options {
 
 type Func = () => any;
 
+const defaultResult = { result: {}, start: () => {}, reset: () => {} };
+
 function usePolling(callback: Func, options: Options): Polling {
   const { timeout = 0, terminate, initValue = {} } = options;
-  const defaultResult = { result: {}, start: () => {} };
   let timer: any = null;
 
   if (!isFunction(terminate)) {
@@ -38,6 +40,11 @@ function usePolling(callback: Func, options: Options): Polling {
   }
 
   const [result, setResult] = useState(initValue || {});
+
+  const clearTime = useCallback(() => {
+    timer && clearTimeout(timer);
+  }, []);
+
   const start = useCallback((params: any) => {
     const promise = callback(params);
     if (!isPromise(promise)) {
@@ -50,7 +57,7 @@ function usePolling(callback: Func, options: Options): Polling {
             error('the return of terminate must be Boolean type.');
           } else {
             if (isNotPolling) {
-              timer && clearTimeout(timer);
+              clearTime();
               setResult(response);
             } else {
               timer = setTimeout(() => {
@@ -65,14 +72,20 @@ function usePolling(callback: Func, options: Options): Polling {
     }
   }, []);
 
+  const reset = useCallback((initData: any) => {
+    clearTime();
+    const data = initData ? initData : initValue;
+    setResult(data);
+  }, []);
+
   // 销毁时清除定时器
   useEffect(() => {
     return () => {
-      timer && clearTimeout(timer);
+      clearTime();
     };
   }, []);
 
-  return { result, start };
+  return { result, start, reset };
 }
 
 export default usePolling;
