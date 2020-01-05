@@ -20,6 +20,7 @@ interface Options {
   timeout?: number;
   terminate: (data: any) => boolean;
   initValue?: any;
+  onError?: (error: any) => any;
 }
 
 type Func = () => any;
@@ -27,7 +28,7 @@ type Func = () => any;
 const defaultResult = { result: {}, start: () => {}, reset: () => {} };
 
 function usePolling(callback: Func, options: Options): Polling {
-  const { timeout = 0, terminate, initValue = {} } = options;
+  const { timeout = 0, terminate, initValue = {}, onError } = options;
   let timer: any = null;
 
   if (!isFunction(terminate)) {
@@ -67,7 +68,12 @@ function usePolling(callback: Func, options: Options): Polling {
           }
         })
         .catch((e: any) => {
-          throw e;
+          if (onError && isFunction(onError)) {
+            const data = onError(e);
+            setResult(data || {});
+          } else {
+            throw e;
+          }
         });
     }
   }, []);

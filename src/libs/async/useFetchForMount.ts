@@ -1,5 +1,6 @@
 /**
  * @file the fetch fo hook
+ * todo: 后续将每个配置项集中起来，并加上onError
  */
 import { useEffect, useState } from 'react';
 import { get } from 'lodash';
