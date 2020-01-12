@@ -5,13 +5,13 @@ import { useMemo } from 'react';
 import { error, warning } from '../../utils/log';
 import { hasProperty } from '../../utils/tools';
 
-function handleByObject(originStyle: object, mapping: object): object {
+type Value = { [key: string]: any };
+
+function handleByObject(originStyle: Value, mapping: Value): object {
   const keys = Object.keys(mapping);
   let targetStyle = {};
   keys.forEach((key) => {
-    // @ts-ignore
     if (hasProperty(originStyle, key) && mapping[key]) {
-      // @ts-ignore
       targetStyle = originStyle[key];
     }
   });

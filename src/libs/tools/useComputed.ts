@@ -5,13 +5,18 @@ import { useMemo, useRef } from 'react';
 import { isArray } from '../../utils/tools';
 import { error, warning } from '../../utils/log';
 
-function handleKV(target: { deps?: Array<any> }): object {
+type Value = { [index: string]: any };
+
+type Target = { deps?: Array<any>; [index: string]: any };
+
+type SaveData = { current: { [key: string]: any } };
+
+function handleKV(target: Target): object {
   const deps = target.deps || [];
   const keys = Object.keys(target).filter((key) => key !== 'deps');
   return useMemo(() => {
-    const value = {};
+    const value: Value = {};
     keys.forEach((key) => {
-      // @ts-ignore
       value[key] = target[key]();
     });
     return value;
@@ -29,12 +34,11 @@ function useComputed(array: any): object {
     }
   }
 
-  const saveData = useRef({});
+  const saveData: SaveData = useRef({});
   array.forEach((item: { deps?: Array<any> }) => {
-    const temResult = handleKV(item);
+    const temResult: Value = handleKV(item);
     const keys = Object.keys(temResult);
     keys.forEach((key) => {
-      // @ts-ignore
       saveData.current[key] = temResult[key];
     });
   });

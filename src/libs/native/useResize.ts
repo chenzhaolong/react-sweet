@@ -3,6 +3,8 @@
  */
 import { useEffect, useMemo } from 'react';
 
+type value = (e: any) => any;
+
 function debounce(fn: (e: object) => any, delay: number): () => any {
   let timeout: any;
   return function(...rest: any) {
@@ -19,12 +21,11 @@ function debounce(fn: (e: object) => any, delay: number): () => any {
 }
 
 function useResize(callback: (e: object) => any) {
-  const resizeFn = useMemo(() => {
+  const resizeFn: value = useMemo(() => {
     return debounce(callback, 605);
   }, []);
   useEffect(() => {
     window.onresize = function(e: object) {
-      // @ts-ignore
       resizeFn(e);
     };
     return () => {
