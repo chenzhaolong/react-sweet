@@ -8,7 +8,8 @@ import { error } from '../../utils/log';
 import { isPromise } from '../../utils/tools';
 
 interface Options {
-  when: (data: any) => Promise<any>;
+  antecedents: Fetch; // 被依赖项
+  consequence: Fetch; // 依赖项
   initValue?: any;
   path?: string;
   onError?: (error: any) => any;
@@ -23,10 +24,15 @@ type Fetch = (params?: any) => Promise<any>;
 
 const defaultResult = { result: {}, start: () => {} };
 
-function useRelyFetch(fetch: Fetch, options: Options): Result {
-  const { when, initValue = {}, onError, path } = options;
-  if (!when || !isFunction(when)) {
-    error('the first params of input must be exist and be Promise type.');
+function useRelyFetch(options: Options): Result {
+  const { antecedents, consequence, initValue = {}, onError, path } = options;
+  if (!antecedents || !isFunction(antecedents)) {
+    error('the antecedents of options must be exist and be Promise type.');
+    return defaultResult;
+  }
+
+  if (!consequence || !isFunction(consequence)) {
+    error('the consequence of options must be exist and be Promise type.');
     return defaultResult;
   }
 
@@ -41,13 +47,13 @@ function useRelyFetch(fetch: Fetch, options: Options): Result {
   }, []);
 
   const start = useCallback((params: any) => {
-    const promise1 = when(params);
+    const promise1 = antecedents(params);
     if (!isPromise(promise1)) {
       error('the function of when must be Promise type.');
     } else {
       promise1
         .then((data: any) => {
-          fetch(data)
+          consequence(data)
             .then((response: any) => {
               const res = path ? get(response, 'path') : response;
               setResult(res);

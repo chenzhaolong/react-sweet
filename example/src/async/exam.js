@@ -123,14 +123,17 @@ function CheckPolling (props) {
 }
 
 function CheckRely(props) {
-  const {result, start} = useRelyFetch((params) => {
-    return fetch2(params);
-  }, {
-    when(params) {
+  const {result, start} = useRelyFetch({
+    // 前因
+    antecedents(params) {
       return fetch1(params)
         .then(d => {
           return {a: d.a + 10};
         });
+    },
+    // 后果
+    consequence(params) {
+      return fetch2(params);
     }
   });
   return <div>
