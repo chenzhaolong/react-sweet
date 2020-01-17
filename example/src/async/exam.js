@@ -15,7 +15,10 @@ export class Async extends Component {
         {/*<CheckMountFetch />*/}
         {/*<CheckFetchAll id={this.state.changeId}/>*/}
         <CheckPolling/>
-        <CheckRely />
+        <CheckRely id={this.state.changeId}/>
+        <button onClick={(e) => {
+          this.setState({changeId: this.state.changeId + 2})
+        }}>点击-{this.state.changeId}</button>
       </div>
     )
   }
@@ -94,11 +97,12 @@ function CheckPolling (props) {
     timeout: 1000,
     initValue: {a: {b: {c: ''}}}
   });
-  const {start: action} = useRelyFetch((params) => {
-    start(0);
-    return Promise.resolve();
-  }, {
-    when(params) {
+  const {start: action} = useRelyFetch({
+    first(params) {
+      start(0);
+      return Promise.resolve();
+    },
+    last(params) {
       return fetch1(params)
         .then(d => {
           return {a: d.a + 10};
@@ -125,14 +129,14 @@ function CheckPolling (props) {
 function CheckRely(props) {
   const {result, start} = useRelyFetch({
     // 前因
-    antecedents(params) {
+    first(params) {
       return fetch1(params)
         .then(d => {
           return {a: d.a + 10};
         });
     },
     // 后果
-    consequence(params) {
+    last(params) {
       return fetch2(params);
     }
   });
