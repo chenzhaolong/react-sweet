@@ -9,8 +9,8 @@ interface Value {
   updateTimes: number;
 }
 
-function useLifeStatus(): Value {
-  const render = useRef({ status: 'mount', updateTimes: 0 });
+function useLifeStatus(deps?: Array<any>): Value {
+  const render = useRef({ status: 'mount', updateTimes: 0, deps });
   useEffect(() => {
     if (render.current.status === 'mount') {
       render.current.status = 'mounted';
@@ -20,7 +20,7 @@ function useLifeStatus(): Value {
     } else if (render.current.status === 'update') {
       render.current.updateTimes = render.current.updateTimes + 1;
     }
-  });
+  }, deps);
   return render.current;
 }
 

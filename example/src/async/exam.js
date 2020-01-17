@@ -2,7 +2,7 @@
  * @file check the async of hooks
  */
 import React, {Component, useEffect, useState, useMemo} from 'react'
-import {useFetchForMount, useFetchAll, usePolling, useRelyFetch} from '../../react-sweet/src';
+import {useFetchForMount, useFetchAll, usePolling, useRelyFetch, useLifeStatus} from '../../react-sweet/src';
 
 export class Async extends Component {
   state = {
@@ -127,6 +127,10 @@ function CheckPolling (props) {
 }
 
 function CheckRely(props) {
+  const data = useLifeStatus();
+  useEffect(() => {
+    console.log(data)
+  })
   const {result, start} = useRelyFetch({
     // 前因
     first(params) {
@@ -144,6 +148,6 @@ function CheckRely(props) {
     <p>结果：{result.data}</p>
     <button onClick={e => {
       start({a: 1});
-    }}>点击</button>
+    }}>点击-{data.status}</button>
   </div>
 }
