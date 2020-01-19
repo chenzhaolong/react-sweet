@@ -35,4 +35,5 @@ export { default as useRelyFetch } from './libs/async/useRelyFetch';
 
 /* form verify */
 export { default as useRules } from './libs/formVerify/useRules';
+export { default as useRule } from './libs/formVerify/useRule';
 export { default as useInputChange } from './libs/formVerify/useInputChange';
