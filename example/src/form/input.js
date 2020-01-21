@@ -17,3 +17,8 @@ export class Form extends Component {
     )
   }
 }
+
+// 检查输入框是否符合规格
+function CheckInput() {
+
+}

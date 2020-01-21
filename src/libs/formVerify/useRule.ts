@@ -8,10 +8,15 @@ import { error } from '../../utils/log';
 
 interface Result {
   value: any;
-  verify: (newValue: any) => boolean;
+  verify: (newValue: any, options?: Options) => void;
 }
 
-function useRules(rule: any, initValue?: any): Result {
+interface Options {
+  success: () => any;
+  fail: () => any;
+}
+
+function useRule(rule: any, initValue?: any): Result {
   const [value, setValue] = useState(initValue);
 
   const verifyRule = useMemo(() => {
@@ -33,17 +38,23 @@ function useRules(rule: any, initValue?: any): Result {
     }
   }, []);
 
-  const verify = useCallback((newValue: any) => {
+  const verify = useCallback((newValue: any, options?: Options) => {
+    const effect: Options = options || { success: () => {}, fail: () => {} };
     const result = verifyRule(newValue);
     if (result) {
+      effect.success && effect.success();
       setValue(newValue);
     } else {
-      setValue('');
+      const isHideWhenError = (effect.fail && effect.fail()) || '';
+      if (isType('boolean', isHideWhenError)) {
+        isHideWhenError && setValue('');
+      } else {
+        setValue('');
+      }
     }
-    return result;
   }, []);
 
   return { value, verify };
 }
 
-export default useRules;
+export default useRule;
