@@ -1,14 +1,13 @@
 /**
  * the rules of form input
  */
-type Fn1 = (result: boolean, value: any) => void;
+import { useRule } from './useRule';
 
-interface Result {
-  value: any;
-  verify: (cb?: Fn1) => boolean | void;
+interface Options {
+  [key: string]: any;
 }
 
-function useRules(): Result {
+function useRules(options: Options) {
   return {
     value: '',
     verify: () => {}

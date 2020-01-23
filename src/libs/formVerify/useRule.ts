@@ -56,7 +56,7 @@ function useRule(rule: any, initValue: any): Result {
         setValue('');
       }
     }
-    return result;
+    return { result };
   }, []);
 
   return { value, verify };
