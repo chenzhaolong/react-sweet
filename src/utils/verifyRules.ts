@@ -38,19 +38,12 @@ export default {
     return !regExp.test(val);
   },
 
-  intNumber: (val: any) => {
-    if (!val) {
-      return false;
-    }
-    return parseFloat(val) === parseInt(val);
-  },
-
   specStr: (val: any) => {
     if (!val) {
       return false;
     }
     const str = /[!@#$%^&*()+?\\\/\-【】（ ）「」{}，]+/;
     const regExp = new RegExp(str, 'g');
-    return regExp.test(val);
+    return !regExp.test(val);
   }
 };

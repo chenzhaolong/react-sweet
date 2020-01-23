@@ -16,8 +16,8 @@ interface Options {
   fail: () => any;
 }
 
-function useRule(rule: any, initValue?: any): Result {
-  const [value, setValue] = useState(initValue);
+function useRule(rule: any, initValue: any): Result {
+  const [value, setValue] = useState(initValue || '');
 
   const verifyRule = useMemo(() => {
     if (isType('function', rule)) {
@@ -40,18 +40,23 @@ function useRule(rule: any, initValue?: any): Result {
 
   const verify = useCallback((newValue: any, options?: Options) => {
     const effect: Options = options || { success: () => {}, fail: () => {} };
+    // for number case
+    const realVal = isType('object', newValue) ? newValue.val : newValue;
     const result = verifyRule(newValue);
     if (result) {
       effect.success && effect.success();
-      setValue(newValue);
+      setValue(realVal);
     } else {
-      const isHideWhenError = (effect.fail && effect.fail()) || '';
+      const isHideWhenError = effect.fail && effect.fail();
       if (isType('boolean', isHideWhenError)) {
-        isHideWhenError && setValue('');
+        if (isHideWhenError || !realVal) {
+          setValue('');
+        }
       } else {
         setValue('');
       }
     }
+    return result;
   }, []);
 
   return { value, verify };
