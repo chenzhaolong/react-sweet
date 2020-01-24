@@ -1,6 +1,7 @@
 /**
  * @file tools for react-sweet
  */
+
 /**
  * judge the target object has the property
  * @param target {Object} tested object
@@ -100,4 +101,28 @@ export function getType(value: any) {
  */
 export function isPromise(fn: any): boolean {
   return fn.then && isType('function', fn.then);
+}
+
+/**
+ * get the rule of function
+ * @param options
+ */
+export function getRuleFn(options: { rule: any; Rules: object; error: (msg: string) => any }) {
+  const { rule, Rules, error } = options;
+  if (isType('function', rule)) {
+    return rule;
+  } else {
+    const RulesKey = Object.keys(Rules);
+    if (RulesKey.indexOf(rule) !== -1) {
+      // @ts-ignore
+      return Rules[rule];
+    }
+    if (!rule.test) {
+      error('the rule must be function or special type or RegExp.');
+    } else {
+      return (value: any) => {
+        return rule.test(value);
+      };
+    }
+  }
 }

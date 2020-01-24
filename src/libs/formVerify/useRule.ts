@@ -1,9 +1,10 @@
 /**
  * the rule of form input
+ * todo: 后续的版本可以考虑将校验和组件组合在一起，成为校验型高阶组件
  */
 import { useState, useCallback, useMemo } from 'react';
 import Rules from '../../utils/verifyRules';
-import { isType } from '../../utils/tools';
+import { isType, getRuleFn } from '../../utils/tools';
 import { error } from '../../utils/log';
 
 interface Result {
@@ -20,22 +21,7 @@ function useRule(rule: any, initValue: any): Result {
   const [value, setValue] = useState(initValue || '');
 
   const verifyRule = useMemo(() => {
-    if (isType('function', rule)) {
-      return rule;
-    } else {
-      const RulesKey = Object.keys(Rules);
-      if (RulesKey.indexOf(rule) !== -1) {
-        // @ts-ignore
-        return Rules[rule];
-      }
-      if (!rule.test) {
-        error('the rule must be function or special type or RegExp.');
-      } else {
-        return (value: any) => {
-          return rule.test(value);
-        };
-      }
-    }
+    return getRuleFn({ rule, Rules, error });
   }, []);
 
   const verify = useCallback((newValue: any, options?: Options) => {
