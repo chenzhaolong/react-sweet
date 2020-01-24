@@ -3,7 +3,7 @@
  */
 
 import React, {Component, useEffect, useState, useMemo} from 'react'
-import { useRule } from '../../react-sweet/src';
+import { useRule, useRules } from '../../react-sweet/src';
 
 export class Form extends Component {
   state = {
@@ -14,6 +14,8 @@ export class Form extends Component {
     return (
       <div>
         <CheckInput id={this.props.id}/>
+        <p>分界线</p>
+        <CheckInputAll />
         <button onClick={e => {
           this.setState({changeId: this.state.changeId + 1});
         }}>点击</button>
@@ -94,6 +96,72 @@ function CheckInput(props) {
           console.log('error');
         }
       })
+    }} />
+  </div>
+}
+
+// 检查批量输入框是否符合规范
+function CheckInputAll(props) {
+  const {values, verify, logs, result } = useRules({
+    a: {rule: 'wordNum', initValue: 'wordNum'},
+    b: {rule: 'number', initValue: 1},
+    c: {rule: /[!@#$%]+/, initValue: '2'},
+    d: {rule: function(val) {
+        return !/[!@#$%]+/.test(val);
+      }, initValue: '12'}
+  });
+
+  useEffect(() => {
+    console.log('result', result);
+    console.log('logs', logs);
+    console.log('values', values);
+  });
+
+  return <div>
+    <input value={values.a} onChange={(e) => {
+      const a = verify('a', {val:e.target.value, min: 0, max: 10}, {
+        success() {
+          console.log('success');
+        },
+        fail() {
+          console.log('fail');
+          return false
+        }
+      });
+      console.log('a', a);
+    }} />
+    <br />
+    <input value={values.b} onChange={(e) => {
+      verify('b', e.target.value, {
+        success() {
+          console.log('success for wordNum');
+        },
+        fail() {
+          console.log('fail for wordNum');
+          return false;
+        }
+      })
+    }} />
+    <br />
+    <input value={values.c} onChange={e => {
+      verify('c', e.target.value, {
+        success() {
+          console.log('success for noChinese');
+        },
+        fail() {
+          console.log('fail for noChinese');
+          return false;
+        }
+      });
+    }} />
+    <br />
+    <input value={values.d} onChange={e => {
+      verify('d', e.target.value, {
+        fail() {
+          console.log('有特殊字符');
+          return false;
+        }
+      });
     }} />
   </div>
 }

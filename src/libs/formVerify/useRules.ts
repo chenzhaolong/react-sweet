@@ -30,7 +30,7 @@ interface Result {
 }
 
 function useRules(options: Options): Result {
-  if (isType('object', options)) {
+  if (!isType('object', options)) {
     error('the options of input params must be object');
   }
 
@@ -79,30 +79,28 @@ function useRules(options: Options): Result {
     const realVal = isType('object', newValue) ? newValue.val : newValue;
     const effect: Options = options || { success: () => {}, fail: () => {} };
     const temp: Format = values;
+    const tempLogs: Format = logs;
     const resForKey = verifyRules[key](newValue);
+    tempLogs[key] = resForKey;
     if (resForKey) {
       effect.success && effect.success();
       temp[key] = realVal;
-      const resForAllKey = targetKeys.every((key: string) => temp[key]);
-      if (resForAllKey) {
-        setResult(true);
-      }
     } else {
       const isHideWhenError = effect.fail && effect.fail();
       if (isType('boolean', isHideWhenError)) {
         if (isHideWhenError || !realVal) {
           temp[key] = '';
+        } else {
+          temp[key] = realVal;
         }
       } else {
         temp[key] = '';
       }
     }
+    const resForAllKey = targetKeys.every((key: string) => tempLogs[key]);
+    setResult(resForAllKey);
     setValues({ ...temp });
-    if (process.env.NODE_ENV === 'development') {
-      const tempLogs: Format = logs;
-      tempLogs[key] = resForKey;
-      setLogs({ ...tempLogs });
-    }
+    setLogs({ ...tempLogs });
     return resForKey;
   }, []);
 

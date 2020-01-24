@@ -37,6 +37,8 @@ function useRule(rule: any, initValue: any): Result {
       if (isType('boolean', isHideWhenError)) {
         if (isHideWhenError || !realVal) {
           setValue('');
+        } else {
+          setValue(realVal);
         }
       } else {
         setValue('');
