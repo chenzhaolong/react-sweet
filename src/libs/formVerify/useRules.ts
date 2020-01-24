@@ -1,5 +1,6 @@
 /**
  * the rules of form input
+ * todo:后续支持外部注册规则表，然后直接在rule填写外部规则名
  */
 import { useCallback, useMemo, useState } from 'react';
 import { getRuleFn, isType } from '../../utils/tools';
@@ -36,9 +37,9 @@ function useRules(options: Options): Result {
 
   const { targetRules, targetInitValues, targetLogs, targetKeys } = useMemo(() => {
     const targetKeys = Object.keys(options);
-    const targetRules: Format = {},
-      targetInitValues: Format = {},
-      targetLogs: Format = {};
+    const targetRules: Format = {};
+    const targetInitValues: Format = {};
+    const targetLogs: Format = {};
 
     targetKeys.forEach((key: string) => {
       targetRules[key] = get(options, `${key}.rule`, '');

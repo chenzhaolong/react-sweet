@@ -15,7 +15,7 @@ export class Form extends Component {
       <div>
         <CheckInput id={this.props.id}/>
         <p>分界线</p>
-        <CheckInputAll />
+        <CheckInputAll id={this.props.id}/>
         <button onClick={e => {
           this.setState({changeId: this.state.changeId + 1});
         }}>点击</button>
@@ -119,7 +119,7 @@ function CheckInputAll(props) {
 
   return <div>
     <input value={values.a} onChange={(e) => {
-      const a = verify('a', {val:e.target.value, min: 0, max: 10}, {
+      verify('a', {val:e.target.value, min: 0, max: 10}, {
         success() {
           console.log('success');
         },
@@ -128,7 +128,7 @@ function CheckInputAll(props) {
           return false
         }
       });
-      console.log('a', a);
+      console.log('a', logs.a);
     }} />
     <br />
     <input value={values.b} onChange={(e) => {

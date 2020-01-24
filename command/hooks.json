@@ -33,6 +33,6 @@
   "form": {
     "useRule": true,
     "useRules": true,
-    "useInputChange": true
+    "useInputChange": false
   }
 }
