@@ -1,16 +1,11 @@
-/**
- * @file list指令入口
- */
+#!/usr/bin/env node
 
-module.exports = {
-  name: 'rs-list.ts',
+// @ts-ignore
+const program = require('commander');
 
-  description: 'wea',
-
-  args: [['--mode', 'production']],
-
-  run(args: any, a: any) {
-    console.log('args', args);
-    return Promise.resolve();
-  }
-};
+program
+  .description('Desc: create the project and download the template from remote repo')
+  .action(function(cmd: any) {
+    console.log('here');
+  })
+  .parse(process.argv);
