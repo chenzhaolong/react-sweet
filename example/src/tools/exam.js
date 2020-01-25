@@ -3,7 +3,7 @@
  */
 
 import React, { Component, useEffect, useState } from 'react';
-import { useTitle, useStyle, useComputed, useFor, useData, createContext, useLogic } from '../../react-sweet/src';
+import { useTitle, useStyle, useComputed, useFor, useData, createContext, useLogic } from '../../react-sweet';
 
 const context = createContext();
 const context1 = createContext();

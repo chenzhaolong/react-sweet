@@ -37,8 +37,8 @@ module.exports = {
     port: 8091,
     inline: true,
     before(app) {
-      app.get('/example/rs', function (req, res) {
-        const templatePath = path.join(__dirname, './index.html');
+      app.get('/example/rs.ts', function (req, res) {
+        const templatePath = path.join(__dirname, './rs.ts.html');
         fs.readFile(templatePath, {'encoding': 'UTF-8'}, function(err, html) {
           res.send(html);
         });
