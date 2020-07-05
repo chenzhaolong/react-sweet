@@ -6,7 +6,8 @@ import { useEffect, useRef } from 'react';
 import { isArray } from 'lodash';
 import { error } from '../../utils/log';
 
-function useUpdate(cb: () => any, deps?: Array<any>) {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function useUpdate(cb: () => any, deps?: Array<any>): void {
   const render = useRef({ isFirstRender: true });
   if (isArray(deps) && deps.length === 0) {
     error(
@@ -19,6 +20,7 @@ function useUpdate(cb: () => any, deps?: Array<any>) {
     } else {
       return cb();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
 
