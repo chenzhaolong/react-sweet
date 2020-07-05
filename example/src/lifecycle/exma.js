@@ -133,7 +133,7 @@ function CheckUpdateComs() {
       update() {
         setData(10);
       },
-      deps: []
+      deps: [a1]
     }
   ]);
   console.log('update', a1)
