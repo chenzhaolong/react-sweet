@@ -7,11 +7,12 @@ import { isArray } from 'lodash';
 import { error } from '../../utils/log';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-function useUpdate(cb: () => any, deps?: Array<any>): void {
+function useUpdate(cb: () => any, deps?: Array<any>, errorMsg?: string): void {
   const render = useRef({ isFirstRender: true });
   if (isArray(deps) && deps.length === 0) {
     error(
-      'deps can not be empty array in useUpdate! if you want to set deps empty, you can use another hook called useMount.'
+      errorMsg ||
+        'deps can not be empty array in useUpdate! if you want to set deps empty, you can use another hook called useMount.'
     );
   }
   useEffect(() => {

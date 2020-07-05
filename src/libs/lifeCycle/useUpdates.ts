@@ -6,16 +6,20 @@ import { useUpdate } from '../../index';
 import { isArray } from '../../utils/tools';
 import { error } from '../../utils/log';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface Option {
-  update(): any;
+  update(): () => any;
   deps: Array<any>;
 }
 
-function useUpdates(options: Array<Option> | Option) {
+const errorMsg = 'deps can not be empty array in useUpdates! please make sure your deps.';
+
+function useUpdates(options: Array<Option> | Option): void {
   if (isArray(options)) {
     // @ts-ignore
     options.forEach((item: Option) => {
-      useUpdate(item.update, item.deps);
+      /* eslint-disable react-hooks/rules-of-hooks */
+      useUpdate(item.update, item.deps, errorMsg);
     });
   } else if (typeof options === 'object') {
     error('the input is object, maybe you can use the hook of useUpdate');
