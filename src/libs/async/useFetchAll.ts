@@ -17,6 +17,7 @@ function useFetchAll(fetchList: FetchList, initValue?: Obj, deps: Array<any> = [
     return {};
   }
   const fetchKey = Object.keys(fetchList);
+  // todo: 可能存在执行多次fetchList里面每个key函数
   const result = fetchKey.every((key) => {
     return isPromise(fetchList[key]);
   });

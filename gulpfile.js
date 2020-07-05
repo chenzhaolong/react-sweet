@@ -29,7 +29,7 @@ gulp.task('compilerCli', () => {
 
 gulp.task('watch', () => {
   w('src/**/*.ts', 'compilerSrc');
-  w('command/**/*.ts', 'compilerCli');
+  //w('command/**/*.ts', 'compilerCli');
 });
 
-gulp.task('compiler', ['compilerSrc', 'compilerCli', 'watch']);
+gulp.task('compiler', ['compilerSrc', 'watch']);

@@ -55,7 +55,7 @@ function useRelyFetch(options: Options): Result {
         .then((data: any) => {
           last(data)
             .then((response: any) => {
-              const res = path ? get(response, 'path') : response;
+              const res = path ? get(response, path) : response;
               setResult(res);
             })
             .catch((e: any) => {
