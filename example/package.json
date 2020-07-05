@@ -4,7 +4,8 @@
   "description": "the examples of react-sweet",
   "main": "src/index.js",
   "scripts": {
-    "server": "webpack-dev-server --inline --config ./webpack.config.js"
+    "server": "webpack-dev-server --inline --config ./webpack.config.js",
+    "eslint": "eslint --init"
   },
   "keywords": [
     "exmaple"
@@ -24,6 +25,8 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
+    "eslint": "^7.4.0",
+    "eslint-plugin-react": "^7.20.3",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-hot-loader": "^4.5.3",
@@ -33,6 +36,7 @@
   },
   "dependencies": {
     "element-react": "^1.4.34",
-    "element-theme-default": "^1.4.13"
+    "element-theme-default": "^1.4.13",
+    "eslint-plugin-react-hooks": "^4.0.5"
   }
 }

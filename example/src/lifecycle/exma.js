@@ -8,7 +8,8 @@ import {useMount, useUpdate, useUpdates, useDestroy, useLifeStatus, useLifeCycle
 export class Life extends Component {
   state = {
     display1: true,
-    display2: true
+    display2: true,
+    id: 0
   };
 
   display1 = () => {
@@ -37,6 +38,10 @@ export class Life extends Component {
         <CheckUpdateCom />
         <CheckUpdateComs />
         <CheckLifeCycle />
+        <A1 id={this.state.id} />
+        <button onClick={() => {
+          this.setState({id: Math.random()})
+        }}>改变id</button>
       </div>
     )
   }
@@ -47,7 +52,7 @@ export function CheckMountCom() {
   const [value, setValue] = useState('no');
   useMount({
     mount() {
-      console.log(value)
+      console.log('mount', value)
     },
     clean() {
       console.log('clean');
@@ -162,4 +167,17 @@ function CheckLifeCycle() {
       setLife(val => val + 20)
     }}>改变生命周期</button>
   </p>
+}
+
+function A1 (id) {
+  const [a, setA] = useState(0);
+  const fn = () => {
+    setA(a + 1);
+  }
+
+  useEffect(() => {
+    fn()
+  }, [id])
+
+  return <div>测试：{a}</div>
 }

@@ -14,11 +14,11 @@ class App extends Component {
   render() {
     return (
       <div>
-        {/*<Life />*/}
+        <Life />
         {/*<Tools />*/}
         {/*<Native />*/}
         {/*<Async />*/}
-        <Form />
+        {/* <Form /> */}
       </div>
     )
   }
