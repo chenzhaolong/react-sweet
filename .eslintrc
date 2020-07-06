@@ -39,6 +39,7 @@
     "@typescript-eslint/no-this-alias": 0,
     "@typescript-eslint/no-var-requires": 0,
     "@typescript-eslint/triple-slash-reference": ["error", { "path": "always", "types": "never", "lib": "never" }],
+    "@typescript-eslint/no-explicit-any": 0,
     // React相关校验规则
     "react/jsx-indent": [2, 4],
     "react/jsx-no-undef": [2, { "allowGlobals": true }],

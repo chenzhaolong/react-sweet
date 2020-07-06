@@ -3,7 +3,7 @@
  */
 
 import React, { Component, useEffect, useState, useMemo } from 'react';
-import {useMount, useUpdate, useUpdates, useDestroy, useLifeStatus, useLifeCycle} from '../../react-sweet/src/index';
+import {useMount, useUpdate, useUpdates, useDestroy, useTrace, useLifeCycle} from '../../react-sweet/src/index';
 
 export class Life extends Component {
   state = {
@@ -83,7 +83,7 @@ function CheckMountHandleAjax(props) {
       clearTimeout(timeout)
     }
   });
-  const status = useLifeStatus();
+  const status = useTrace();
   useEffect(() => {
     console.log('CheckMountHandleAjax', status);
   });
@@ -137,7 +137,7 @@ function CheckUpdateComs() {
     }
   ]);
   console.log('update', a1)
-  const status = useLifeStatus();
+  const status = useTrace();
   useEffect(() => {
     console.log('CheckUpdateComs', status);
   });

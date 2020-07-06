@@ -6,7 +6,6 @@ import { useEffect, useRef } from 'react';
 import { isArray } from 'lodash';
 import { error } from '../../utils/log';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 function useUpdate(cb: () => any, deps?: Array<any>, errorMsg?: string): void {
   const render = useRef({ isFirstRender: true });
   if (isArray(deps) && deps.length === 0) {

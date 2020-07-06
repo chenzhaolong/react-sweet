@@ -6,7 +6,6 @@ import { useUpdate } from '../../index';
 import { isArray } from '../../utils/tools';
 import { error } from '../../utils/log';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 interface Option {
   update(): () => any;
   deps: Array<any>;

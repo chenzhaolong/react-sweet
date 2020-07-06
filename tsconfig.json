@@ -16,7 +16,9 @@
        "src",
        "command"
      ],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true
   },
   "include": [
     "command/**/*",
