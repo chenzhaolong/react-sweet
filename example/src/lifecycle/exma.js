@@ -3,7 +3,7 @@
  */
 
 import React, { Component, useEffect, useState, useMemo } from 'react';
-import {useMount, useUpdate, useUpdates, useDestroy, useTrace, useLifeCycle} from '../../react-sweet/src/index';
+import {useMount, useUpdate, useUpdates, useDestroy, useTrace, useLifeCycle, useTraces} from '../../react-sweet/src/index';
 
 export class Life extends Component {
   state = {
@@ -138,8 +138,10 @@ function CheckUpdateComs() {
   ]);
   console.log('update', a1)
   const status = useTrace();
+  const traces = useTraces({a2});
   useEffect(() => {
     console.log('CheckUpdateComs', status);
+    console.log('traces', traces)
   });
   return <div>
     <button onClick={() => {

@@ -126,3 +126,10 @@ export function getRuleFn(options: { rule: any; Rules: object; error: (msg: stri
     }
   }
 }
+
+/**
+ * 格式化日期
+ */
+export function formatDate(date: Date): string {
+  return `${date.getHours()}点${date.getMinutes()}分${date.getSeconds()}秒${date.getUTCMilliseconds()}毫秒`;
+}
