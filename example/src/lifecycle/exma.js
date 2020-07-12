@@ -129,16 +129,16 @@ function CheckUpdateComs() {
       },
       deps: [a2]
     },
-    {
-      update() {
-        setData(10);
-      },
-      deps: [a1]
-    }
+    // {
+    //   update() {
+    //     setData(10);
+    //   },
+    //   deps: [a1]
+    // }
   ]);
   console.log('update', a1)
   const status = useTrace();
-  const traces = useTraces({a2});
+  const traces = useTraces({a2, a1});
   useEffect(() => {
     console.log('CheckUpdateComs', status);
     console.log('traces', traces)

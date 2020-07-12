@@ -25,7 +25,7 @@ interface Options {
   [key: string]: any;
 }
 
-function useTraces(trace: Options): Value2 {
+function useTraces(trace: Options, isHideInProd = false): Value2 {
   if (!isObject(trace)) {
     error('trace of input param must be Object type when use the hook of useTraces!');
   }
@@ -49,20 +49,26 @@ function useTraces(trace: Options): Value2 {
 
   return useMemo(() => {
     const traces: Value2 = render.current;
-    const result: Value2 = traces.map((item: Value1) => {
-      if (!isEqual(item.currentValue, trace[item.dep])) {
-        return {
-          dep: item.dep,
-          updateTimes: item.updateTimes + 1,
-          prevUpdateTime: item.currentUpdateTime,
-          currentUpdateTime: formatDate(new Date()),
-          currentValue: trace[item.dep],
-          prevValue: item.currentValue
-        };
-      } else {
-        return item;
-      }
-    });
+    let result: Value2;
+    // 生产环境下不追踪
+    if (isHideInProd) {
+      result = traces;
+    } else {
+      result = traces.map((item: Value1) => {
+        if (!isEqual(item.currentValue, trace[item.dep])) {
+          return {
+            dep: item.dep,
+            updateTimes: item.updateTimes + 1,
+            prevUpdateTime: item.currentUpdateTime,
+            currentUpdateTime: formatDate(new Date()),
+            currentValue: trace[item.dep],
+            prevValue: item.currentValue
+          };
+        } else {
+          return item;
+        }
+      });
+    }
     render.current = result;
     return render.current;
     // eslint-disable-next-line react-hooks/exhaustive-deps

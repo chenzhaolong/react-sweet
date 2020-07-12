@@ -25,9 +25,9 @@ function useLifeCycle(deps?: Array<any>): LifeCycle {
   const lifeCycle: LifeCycle = useMemo(() => {
     return {
       queue: {
-        mount: () => {},
-        update: () => {},
-        destroy: () => {}
+        mount: (): any => {},
+        update: (): any => {},
+        destroy: (): any => {}
       },
       mount(cb: () => any) {
         if (cb && typeof cb === 'function') {
