@@ -30,14 +30,14 @@ export class Tools extends Component {
     return (
       <div>
         {/*<SetPageTitle title='任意'/>*/}
-        {/*<CheckTheStyle mode={this.state.mode} />*/}
-        {/*<CheckTheStyleByFunc mode={this.state.mode} id={this.state.id} />*/}
+        <CheckTheStyle mode={this.state.mode} />
+        <CheckTheStyleByFunc mode={this.state.mode} id={this.state.id} />
         {/*<button onClick={() => {*/}
         {/*  this.setState({id: this.state.id + 1})*/}
         {/*}}>改变id-{this.state.id}</button>*/}
-        {/*<button onClick={() => {*/}
-        {/*  this.setState({mode: this.state.mode === 'add' ? 'edit' : 'add'})*/}
-        {/*}}>改变模式</button>*/}
+        <button onClick={() => {
+          this.setState({mode: this.state.mode === 'add' ? 'edit' : 'add'})
+        }}>改变模式</button>
         {/*<button onClick={() => {*/}
         {/*  this.setState({date: Date.now()})*/}
         {/*}}>改变日期</button>*/}

@@ -14,8 +14,8 @@ class App extends Component {
   render() {
     return (
       <div>
-        <Life />
-        {/*<Tools />*/}
+        {/* <Life /> */}
+        <Tools />
         {/*<Native />*/}
         {/*<Async />*/}
         {/* <Form /> */}

@@ -5,9 +5,11 @@ import { useMemo } from 'react';
 import { error, warning } from '../../utils/log';
 import { hasProperty } from '../../utils/tools';
 
-type Value = { [key: string]: any };
+type Value = { [key: string]: number | string };
 
-function handleByObject(originStyle: Value, mapping: Value): object {
+type Mapping = { [key: string]: boolean };
+
+function handleByObject(originStyle: Value, mapping: Mapping): object {
   const keys = Object.keys(mapping);
   let targetStyle = {};
   keys.forEach((key) => {
@@ -18,12 +20,12 @@ function handleByObject(originStyle: Value, mapping: Value): object {
   return targetStyle;
 }
 
-function useStyle(style: object, second?: any, deps?: Array<any>): object {
+function useStyle(style: Value, condition?: any, deps: Array<any> = []): object {
   const saveStyle = useMemo(() => {
-    if (second && typeof second === 'object') {
-      return handleByObject(style, second);
-    } else if (second && typeof second === 'function') {
-      const handleStyle = second(style);
+    if (condition && typeof condition === 'object') {
+      return handleByObject(style, condition);
+    } else if (condition && typeof condition === 'function') {
+      const handleStyle = condition(style);
       if (handleStyle) {
         return handleStyle;
       } else {
@@ -32,8 +34,8 @@ function useStyle(style: object, second?: any, deps?: Array<any>): object {
       }
     } else {
       error('the second params of useStyle must be object or function');
-      return {};
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return saveStyle;
