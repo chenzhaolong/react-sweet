@@ -11,7 +11,7 @@ interface Params {
   clean?(): void;
 }
 
-function useMount(cb: () => any | Params) {
+function useMount(cb: () => any | Params): void {
   useEffect(() => {
     if (typeof cb === 'function') {
       return cb();
@@ -23,11 +23,12 @@ function useMount(cb: () => any | Params) {
           const clean: () => any = cb['clean'];
           return clean;
         }
-        return () => {};
+        return (): void => {};
       } else {
         error('options of useMount must has property of mount!');
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
 

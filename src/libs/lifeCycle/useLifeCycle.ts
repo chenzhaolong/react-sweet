@@ -26,22 +26,22 @@ function useLifeCycle(deps?: Array<any>): LifeCycle {
     return {
       queue: {
         mount: (): any => {},
-        update: (): any => {},
-        destroy: (): any => {}
+        update: (): void => {},
+        destroy: (): void => {}
       },
-      mount(cb: () => any) {
+      mount(cb: () => any): any {
         if (cb && typeof cb === 'function') {
           this.queue.mount = cb;
         }
         return this;
       },
-      update(cb: () => any) {
+      update(cb: () => any): any {
         if (cb && typeof cb === 'function') {
           this.queue.update = cb;
         }
         return this;
       },
-      destroy(cb: () => any) {
+      destroy(cb: () => any): any {
         if (cb && typeof cb === 'function') {
           this.queue.destroy = cb;
         }
