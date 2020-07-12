@@ -131,10 +131,6 @@ function ComputedValue(props) {
       deps: [id]
     },
     {
-      val2() {
-        console.log('val2')
-        return `date-${date}`
-      },
       val3() {
         console.log('val3')
         return `id和date-${id}:${date}`
