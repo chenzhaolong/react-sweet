@@ -17,7 +17,12 @@ function useCondition(options: Options, deps?: Array<any>): any {
   return useMemo(() => {
     const { yes, no, condition } = options;
     const result = typeof condition === 'function' ? condition() : condition;
-    return result ? yes || null : no || null;
+    if (result) {
+      return typeof yes === 'function' ? yes() : yes;
+    } else {
+      return typeof no === 'function' ? no() : no;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
 
