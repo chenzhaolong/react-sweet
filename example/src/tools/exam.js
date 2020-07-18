@@ -3,7 +3,7 @@
  */
 
 import React, { Component, useEffect, useState } from 'react';
-import { useTitle, useStyle, useComputed, useFor, useData, createContext, useLogic } from '../../react-sweet';
+import { useTitle, useStyle, useComputed, useFor, useData, createContext, useMethod } from '../../react-sweet';
 
 const context = createContext();
 const context1 = createContext();
@@ -256,7 +256,7 @@ function A3(props) {
 }
 
 function CheckLogic(props) {
-  const {value, trigger} = useLogic(props.id, (val, a, b) => {
+  const {value, trigger} = useMethod(props.id, (val, a, b) => {
     console.log(b);
     return val + a + b
   });

@@ -11,17 +11,18 @@ interface Fn {
   trigger: () => any;
 }
 
-function useLogic(data: any, fn: (val: any, args: Array<any>) => any): Fn {
+function useMethod(data: any, fn: (val: any, args: Array<any>) => any): Fn {
   const [value, setRender] = useState(data);
   if (!isFunction(fn)) {
     error('the second params of input must be the type of function');
   }
   const trigger = useMemo(() => {
-    return (...args: Array<any>) => {
+    return (...args: any): void => {
       setRender((val: any) => fn(val, ...args));
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return { value, trigger };
 }
 
-export default useLogic;
+export default useMethod;
