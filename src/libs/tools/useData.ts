@@ -34,7 +34,7 @@ export function shadowEqual(obj1: object, obj2: object): boolean {
   });
 }
 
-function equal(oldValue: any, newValue: any) {
+function diffent(oldValue: any, newValue: any): boolean {
   const oldType = getType(oldValue);
   const newType = getType(newValue);
   if (oldType !== newType) {
@@ -68,27 +68,26 @@ function equal(oldValue: any, newValue: any) {
 function useData(value: object): ReturnValue {
   if (!isType('object', value)) {
     error('please check the type of input, the input of useData must be object type!');
-    return { data: value, changeData: () => {} };
   }
 
   const [data, setData] = useState(value);
   const changeData = useCallback((path: string, newValue: any) => {
     if (!isType('string', path)) {
       error('the path in changeData must be string');
-      return;
     }
     if (!path) {
       error('the path in changeData can not be undefined!');
-      return;
     }
     const oldValue = get(value, path, '');
-    if (equal(oldValue, newValue)) {
-      const targetValue = set(value, path, newValue);
+    if (diffent(oldValue, newValue)) {
+      const targetValue = set(data, path, newValue);
       setData(cloneDeep(targetValue));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return useMemo(() => {
     return { data, changeData };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 }
 
