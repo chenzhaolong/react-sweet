@@ -142,7 +142,7 @@ function ComputedValue(props) {
       value() {
         return date + wait.a
       },
-      deps: {date, wait: wait.a}
+      deps: {date, wait: wait}
     }
   })
   return (<div>

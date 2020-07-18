@@ -5,7 +5,7 @@
 import { useMemo, useRef, useCallback } from 'react';
 import { isType } from '../../utils/tools';
 import { error } from '../../utils/log';
-import { isEqual } from 'lodash';
+import { isEqual, cloneDeep } from 'lodash';
 
 type SaveData = { current: { [key: string]: any } };
 
@@ -41,7 +41,7 @@ function useComputed(computedObj: ComputedObj): object {
   const defaultDeps = useMemo(() => {
     const obj = {};
     computedKeys.forEach((key: string) => {
-      obj[key] = computedObj[key].deps || {};
+      obj[key] = computedObj[key].deps ? cloneDeep(computedObj[key].deps) : {};
     });
     return obj;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,7 +74,7 @@ function useComputed(computedObj: ComputedObj): object {
       const { value, deps = {} } = computedObj[key];
       const isChange = !isEqual(saveDeps.current[key], deps);
       if (isChange) {
-        saveDeps.current[key] = deps;
+        saveDeps.current[key] = cloneDeep(deps);
         result[key] = value();
       }
     });
