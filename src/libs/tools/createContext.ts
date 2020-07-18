@@ -1,8 +1,8 @@
 /**
  * @file the context of react hook
  */
-import { useCallback, useEffect } from 'react';
-import { isFunction } from 'lodash';
+import { useCallback, useRef } from 'react';
+import { isFunction, isEqual } from 'lodash';
 import { hasProperty } from '../../utils/tools';
 
 type TempZone = {
@@ -12,6 +12,11 @@ type TempZone = {
 type Events = {
   [key: string]: Array<any>;
 };
+
+interface Result {
+  useSend: (name: string, publishByDiffMessage: boolean) => (data: any) => void;
+  useReceive: (name: string, callback: () => any) => void;
+}
 
 class ContextEvent {
   events: Events;
@@ -33,7 +38,7 @@ class ContextEvent {
     }
   }
 
-  listener(name: string, cb: (value: any) => any) {
+  listener(name: string, cb: (value: any) => any): void {
     if (hasProperty(this.tempZone, name)) {
       cb(this.tempZone[name]);
       delete this.tempZone[name];
@@ -50,19 +55,46 @@ class ContextEvent {
   }
 }
 
-function createContext() {
+function createContext(): Result {
   const context = new ContextEvent();
+  const historyMsg = {};
+  const registerMsg = (name: string): void => {
+    if (!historyMsg[name]) {
+      historyMsg[name] = [];
+    }
+  };
+  const hasSameHistoryMsg = (name: string, msg: any): boolean => {
+    if (historyMsg[name].length > 0) {
+      if (!isEqual(historyMsg[name][0], msg)) {
+        historyMsg[name].shift();
+        historyMsg[name].push(msg);
+        return false;
+      }
+      return true;
+    } else {
+      historyMsg[name].push(msg);
+      return false;
+    }
+  };
   return {
-    useSend(name: string, prop: any, deps?: Array<any>) {
-      useEffect(() => {
-        context.publish(name, prop);
-      }, deps);
+    useSend(name: string, publishByDiffMessage = false): (data: any) => void {
+      publishByDiffMessage && registerMsg(name);
+      const send = useCallback((data: any) => {
+        if (publishByDiffMessage) {
+          !hasSameHistoryMsg(name, data) && context.publish(name, data);
+        } else {
+          context.publish(name, data);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
+      return send;
     },
-    useReceive(name: string, callback: () => any): any {
+    useReceive(name: string, callback: () => any): void {
       const events = useCallback((callback) => {
         context.listener(name, callback);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, []);
-      return events(callback);
+      events(callback);
     }
   };
 }

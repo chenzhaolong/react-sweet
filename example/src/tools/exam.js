@@ -226,10 +226,18 @@ function ChangeValue() {
 
 function A1(props) {
   // context.useSend('A1', {a: props.date}, [props.date]);
-  context1.useSend('A1', {a: props.date}, [props.date]);
+  const send = context1.useSend('A1');
+  const send2 = context1.useSend('A2', true);
+  useEffect(() => {
+    send2('周日');
+  }, [])
   return (
     <div>
       <A2/>
+      <button onClick={() => {
+        send('周六');
+        send2('周日1');
+      }}>发布消息</button>
     </div>
   )
 }
@@ -243,14 +251,17 @@ function A2(props) {
 }
 
 function A3(props) {
-  const [A, setA] = useState({});
+  const [data, setA] = useState('');
   context1.useReceive('A1', (value) => {
     console.log('change');
     setA(value);
   });
+  context1.useReceive('A2', (value) => {
+    console.log('change', value);
+  });
   return (
     <div>
-      来自A1的属性{A.a}
+      来自A1的属性{data}
     </div>
   )
 }
