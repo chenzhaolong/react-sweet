@@ -45,7 +45,7 @@
     "gulp-watch": "^5.0.1",
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "react": "^16.8.0",
     "react-dom": "^16.8.0",
     "typescript": "^3.6.4"
