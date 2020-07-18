@@ -38,11 +38,11 @@ export class Tools extends Component {
         <button onClick={() => {
           this.setState({mode: this.state.mode === 'add' ? 'edit' : 'add'})
         }}>改变模式</button>
-        {/*<button onClick={() => {*/}
-        {/*  this.setState({date: Date.now()})*/}
-        {/*}}>改变日期</button>*/}
+        <button onClick={() => {
+          this.setState({id: Date.now()})
+        }}>改变id</button>
 
-        {/*<ComputedValue id={this.state.id} mode={this.state.mode} date={this.state.date} />*/}
+        <ComputedValue id={this.state.id} mode={this.state.mode}/>
 
         <TableList list={this.state.list} />
         <ListItem list={this.state.list} click={this.onClick}/>
@@ -121,28 +121,44 @@ function CheckTheStyleByFunc(props) {
 
 // check the useComputed
 function ComputedValue(props) {
-  const {mode, id, date} = props;
-  const {val1, val2, val3} = useComputed([
-    {
-      val1() {
-        console.log('val1')
-        return `id-${id}`
+  const {mode, id} = props;
+  const [date, setDate] = useState(12);
+  const [wait, setWait] = useState({a: 1});
+  console.log('wait', wait);
+  const {val1, val2, val3} = useComputed({
+    val1: {
+      value() {
+        return `id-${id}`;
       },
-      deps: [id]
+      deps: {id}
     },
-    {
-      val3() {
-        console.log('val3')
-        return `id和date-${id}:${date}`
+    val2: {
+      value() {
+        return date + 1
       },
-      deps: [date]
+      deps: {date}
+    },
+    val3: {
+      value() {
+        return date + wait.a
+      },
+      deps: {date, wait: wait.a}
     }
-  ])
+  })
   return (<div>
     <p>val1: {val1}</p>
     <p>val2: {val2}</p>
     <p>val3: {val3}</p>
     <p>{mode}</p>
+    <button onClick={() => {
+      setDate(val => val + 1);
+    }}>改变date</button>
+    <button onClick={() => {
+      setWait(val => {
+        val.a = val.a + 1;
+        return {...val};
+      })
+    }}>改变wait</button>
   </div>)
 }
 
