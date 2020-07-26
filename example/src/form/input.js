@@ -71,7 +71,6 @@ function CheckInput(props) {
         },
         fail() {
           console.log('fail for noChinese');
-          return false;
         }
       });
     }} />
@@ -80,7 +79,6 @@ function CheckInput(props) {
       obj4.verify(e.target.value, {
         fail() {
           console.log('有特殊字符');
-          return false;
         }
       });
     }} />
@@ -88,7 +86,7 @@ function CheckInput(props) {
     <input value={obj5.value} onChange={e => {
       obj5.verify(e.target.value, {
         fail() {
-          console.log('有特殊字符');
+          console.log('没有特殊字符');
         }
       })
     }} />
@@ -107,7 +105,7 @@ function CheckInput(props) {
 function CheckInputAll(props) {
   const {values, verify, logs, result } = useRules({
     a: {rule: 'wordNum', initValue: 'wordNum'},
-    b: {rule: 'number', initValue: 1},
+    b: {rule: 'number', initValue: 1, isCleanWhenError: true},
     c: {rule: /[!@#$%]+/, initValue: '2'},
     d: {rule: function(val) {
         return !/[!@#$%]+/.test(val);
@@ -128,7 +126,6 @@ function CheckInputAll(props) {
         },
         fail() {
           console.log('fail');
-          return false
         }
       });
       console.log('a', logs.a);

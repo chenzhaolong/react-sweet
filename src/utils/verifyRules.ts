@@ -16,14 +16,15 @@ export default {
     if (!val) {
       return false;
     }
-    if (!min || !max) {
-      warning('has no min and max in verify when use useRule and the rule is wordNum.');
+    // 识别0
+    if (!(min + '') || !(max + '')) {
+      warning('has no min and max in verify when the rule is wordNum.');
       return false;
     }
     const minimum = isType('string', min) ? parseInt(min) : min;
     const maximum = isType('string', max) ? parseInt(max) : max;
     if (minimum >= maximum) {
-      warning('min can not large than or equal to max when use useRule and the rule is wordNum.');
+      warning('min can not large than or equal to max when the rule is wordNum.');
       return false;
     }
     const length = typeof val === 'number' ? val : val.length ? val.length : -1;

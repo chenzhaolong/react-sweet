@@ -15,8 +15,8 @@ interface Options {
 }
 
 interface Options1 {
-  success: () => any;
-  fail: () => any;
+  success?: () => any;
+  fail?: () => any;
 }
 
 interface Result {
@@ -35,18 +35,20 @@ function useRules(options: Options): Result {
     error('the options of input params must be object');
   }
 
-  const { targetRules, targetInitValues, targetLogs, targetKeys } = useMemo(() => {
+  const { targetRules, targetInitValues, targetLogs, targetKeys, targetCleanWhenError } = useMemo(() => {
     const targetKeys = Object.keys(options);
     const targetRules: Format = {};
     const targetInitValues: Format = {};
     const targetLogs: Format = {};
+    const targetCleanWhenError = {};
 
     targetKeys.forEach((key: string) => {
       targetRules[key] = get(options, `${key}.rule`, '');
       targetInitValues[key] = get(options, `${key}.initValue`, '');
       targetLogs[key] = false;
+      targetCleanWhenError[key] = get(options, `${key}.isCleanWhenError`, false);
     });
-    return { targetRules, targetInitValues, targetLogs, targetKeys };
+    return { targetRules, targetInitValues, targetLogs, targetKeys, targetCleanWhenError };
   }, []);
 
   const [values, setValues] = useState(targetInitValues);
@@ -67,18 +69,24 @@ function useRules(options: Options): Result {
     return fn;
   }, []);
 
-  const verify = useCallback((key: string, newValue: any, options?: Options1) => {
+  const verify = useCallback((key: string, newValue: any, options1?: Options1) => {
     if (!isType('string', key)) {
       error('key must be String type');
       return;
     }
     if (!isType('function', verifyRules[key])) {
       error(`the key ${key} has no rule function, please make sure register the rule function`);
-      return;
     }
     // for number case
     const realVal = isType('object', newValue) ? newValue.val : newValue;
-    const effect: Options = options || { success: () => {}, fail: () => {} };
+    let effect: Options1 = {};
+    if (isType('object', options1)) {
+      // @ts-ignore
+      effect = options1;
+    } else if (isType('function', options1)) {
+      // @ts-ignore
+      effect = { success: options1 };
+    }
     const temp: Format = values;
     const tempLogs: Format = logs;
     const resForKey = verifyRules[key](newValue);
@@ -87,15 +95,11 @@ function useRules(options: Options): Result {
       effect.success && effect.success();
       temp[key] = realVal;
     } else {
-      const isHideWhenError = effect.fail && effect.fail();
-      if (isType('boolean', isHideWhenError)) {
-        if (isHideWhenError || !realVal) {
-          temp[key] = '';
-        } else {
-          temp[key] = realVal;
-        }
-      } else {
+      effect.fail && effect.fail();
+      if (targetCleanWhenError[key]) {
         temp[key] = '';
+      } else {
+        temp[key] = realVal;
       }
     }
     const resForAllKey = targetKeys.every((key: string) => tempLogs[key]);
