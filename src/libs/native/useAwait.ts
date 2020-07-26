@@ -17,25 +17,31 @@ interface Result {
 }
 
 function useAwait(callback: any, deps?: Array<any>): Result {
-  const [data, setData] = useState({ status: Status.Wait, data: {} });
+  const [data, setData] = useState({ status: Status.Wait, data: {}, error: '' });
   const realDeps = deps ? deps : [];
   useMemo(() => {
+    setData({
+      status: Status.Wait,
+      data: data.data,
+      error: ''
+    });
     const promise = callback();
     if (!isPromise(promise)) {
       error('the input params must be Promise, please make sure your input whether Promise is.');
-      setData({ status: Status.Fail, data: {} });
     } else {
       promise
-        .then((data: any) => {
+        .then((result: any) => {
           setData({
             status: Status.Success,
-            data: data
+            data: result,
+            error: ''
           });
         })
         .catch((e: any) => {
           setData({
             status: Status.Fail,
-            data: e
+            data: data.data,
+            error: e
           });
         });
     }

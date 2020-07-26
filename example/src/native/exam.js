@@ -13,8 +13,8 @@ export class Native extends Component {
     return (
       <div>
         {/*<CheckFn />*/}
-        <CheckOnresize />
-        <CheckOffset id={this.state.changeId} />
+        {/*<CheckOnresize />*/}
+        {/*<CheckOffset id={this.state.changeId} />*/}
         <CheckPromise id={this.state.changeId} />
         <button onClick={(e) => {
           this.setState({changeId: this.state.changeId + 1})
@@ -75,21 +75,33 @@ function CheckOffset(props) {
 }
 
 function CheckPromise(props) {
-  const {status, data} = useAwait(() => {
-    return becomePromise(props.id)
+  // const {status, data} = useAwait(() => {
+  //   return becomePromise(props.id)
+  // }, [props.id]);
+  const {status, data, error} = useAwait(async () => {
+    const a = await becomePromise(props.id);
+    return a;
   }, [props.id]);
   useEffect(() => {
-    console.log('data', data)
+    console.log('data', data);
+    console.log('status', status);
+    console.log('error', error);
   });
   return <div>
-    答案：{status === 'success' ? data.a1 : ''}
+    答案：{data.a1}
+    <br/>
+    状态: {status}
   </div>
 }
 
 function becomePromise(id) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve({a1: id})
+      if (id > 3) {
+        resolve({a1: id});
+      } else {
+        reject(new Error('demo'));
+      }
     }, 1000)
   });
 }
