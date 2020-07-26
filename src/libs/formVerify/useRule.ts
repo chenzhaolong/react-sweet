@@ -13,19 +13,24 @@ interface Result {
 }
 
 interface Options {
-  success: () => any;
-  fail: () => any;
+  success?: () => any;
+  fail?: () => any;
 }
 
-function useRule(rule: any, initValue: any): Result {
+function useRule(rule: any, initValue: any, isCleanWhenError = false): Result {
   const [value, setValue] = useState(initValue || '');
 
   const verifyRule = useMemo(() => {
     return getRuleFn({ rule, Rules, error });
   }, []);
 
-  const verify = useCallback((newValue: any, options?: Options) => {
-    const effect: Options = options || { success: () => {}, fail: () => {} };
+  const verify = useCallback((newValue: any, options: any) => {
+    let effect: Options = {};
+    if (isType('object', options)) {
+      effect = options;
+    } else if (isType('function', options)) {
+      effect = { success: options };
+    }
     // for number case
     const realVal = isType('object', newValue) ? newValue.val : newValue;
     const result = verifyRule(newValue);
@@ -33,18 +38,23 @@ function useRule(rule: any, initValue: any): Result {
       effect.success && effect.success();
       setValue(realVal);
     } else {
-      const isHideWhenError = effect.fail && effect.fail();
-      if (isType('boolean', isHideWhenError)) {
-        if (isHideWhenError || !realVal) {
-          setValue('');
-        } else {
-          setValue(realVal);
-        }
-      } else {
+      effect.fail && effect.fail();
+      if (isCleanWhenError) {
         setValue('');
+      } else {
+        setValue(realVal);
       }
+      // if (isType('boolean', isHideWhenError)) {
+      //   if (isHideWhenError || !realVal) {
+      //     setValue('');
+      //   } else {
+      //     setValue(realVal);
+      //   }
+      // } else {
+      //   setValue('');
+      // }
     }
-    return { result };
+    return result;
   }, []);
 
   return { value, verify };

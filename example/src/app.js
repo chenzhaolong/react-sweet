@@ -15,10 +15,10 @@ class App extends Component {
     return (
       <div>
         {/* <Life /> */}
-        <Tools />
+        {/*<Tools />*/}
         {/*<Native />*/}
         {/*<Async />*/}
-        {/* <Form /> */}
+         <Form />
       </div>
     )
   }

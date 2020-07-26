@@ -50,15 +50,18 @@ function CheckInput(props) {
     }} />
     <br />
     <input value={obj2.value} onChange={(e) => {
-      obj2.verify({val: e.target.value, min: 1, max: 10}, {
-        success() {
-          console.log('success for wordNum');
-        },
-        fail() {
-          console.log('fail for wordNum');
-          return false;
-        }
-      })
+      // obj2.verify({val: e.target.value, min: 1, max: 10}, {
+      //   success() {
+      //     console.log('success for wordNum');
+      //   },
+      //   fail() {
+      //     console.log('fail for wordNum');
+      //     return false;
+      //   }
+      // })
+      obj2.verify({val: e.target.value, min: 1, max: 10}, () => {
+        console.log('success for wordNum');
+      });
     }} />
     <br />
     <input value={obj3.value} onChange={e => {
