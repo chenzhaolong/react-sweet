@@ -1,21 +1,31 @@
 /**
  * @file 验证规则
  */
+import { warning } from './log';
+import { isType } from './tools';
 
 interface Options {
   val: any;
-  min: number;
-  max: number;
+  min: any;
+  max: any;
 }
 
 export default {
   wordNum: (options: Options) => {
     const { val, min, max } = options;
-    if (!val || min === max) {
+    if (!val) {
       return false;
     }
-    const minimum = min <= max ? min : max;
-    const maximum = min <= max ? max : min;
+    if (!min || !max) {
+      warning('has no min and max in verify when use useRule and the rule is wordNum.');
+      return false;
+    }
+    const minimum = isType('string', min) ? parseInt(min) : min;
+    const maximum = isType('string', max) ? parseInt(max) : max;
+    if (minimum >= maximum) {
+      warning('min can not large than or equal to max when use useRule and the rule is wordNum.');
+      return false;
+    }
     const length = typeof val === 'number' ? val : val.length ? val.length : -1;
     return length >= minimum && length <= maximum;
   },
