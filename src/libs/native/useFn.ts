@@ -4,7 +4,6 @@
 import { useMemo } from 'react';
 import { error } from '../../utils/log';
 import { hasProperty, isArray } from '../../utils/tools';
-import { isString } from 'lodash';
 
 interface Options {
   time: number;
@@ -37,7 +36,7 @@ function throttle(fn: () => any, threshold: number): () => any {
     // @ts-ignore
     const context = this;
     const arg = rest;
-    const diff = start - curTime;
+    const diff = curTime - start;
     if (diff >= threshold) {
       fn.apply(context, arg);
     } else {
@@ -49,30 +48,22 @@ function throttle(fn: () => any, threshold: number): () => any {
   };
 }
 
-function checkOptions(options: Options): boolean {
+function checkOptions(options: Options) {
   if (!options) {
     error('the second params of useFn must be exist!');
-    return false;
   }
 
   if (Object.keys(options).length === 0) {
     error('the second params of useFn can not be empty object!');
-    return false;
   }
 
   if (!hasProperty(options, 'type') || !hasProperty(options, 'time')) {
     error('the second params of useFn must has the property of "time" and "type"!');
-    return false;
   }
-
-  return true;
 }
 
 function useFn(cb: () => any, options: Options, deps: Array<any> | string) {
-  const result = checkOptions(options);
-  if (!result) {
-    return;
-  }
+  checkOptions(options);
   let fn: {
     (fn: () => any, threshold: number): () => any;
     (fn: () => any, delay: number): () => any;
@@ -85,10 +76,8 @@ function useFn(cb: () => any, options: Options, deps: Array<any> | string) {
   }
 
   const realDeps: Array<any> = [options.time];
-  if (deps && isArray(deps)) {
+  if (deps && isArray(deps) && deps.length > 0) {
     realDeps.concat(deps);
-  } else if (deps && isString(deps)) {
-    realDeps.push(deps);
   }
 
   return useMemo(() => {

@@ -12,10 +12,10 @@ export class Native extends Component {
   render() {
     return (
       <div>
-        {/*<CheckFn />*/}
+        <CheckFn />
         {/*<CheckOnresize />*/}
         {/*<CheckOffset id={this.state.changeId} />*/}
-        <CheckPromise id={this.state.changeId} />
+        {/*<CheckPromise id={this.state.changeId} />*/}
         <button onClick={(e) => {
           this.setState({changeId: this.state.changeId + 1})
         }}>change</button>
