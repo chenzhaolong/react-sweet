@@ -12,9 +12,9 @@ export class Native extends Component {
   render() {
     return (
       <div>
-        <CheckFn />
-        {/*<CheckOnresize />*/}
-        {/*<CheckOffset id={this.state.changeId} />*/}
+        {/*<CheckFn />*/}
+        <CheckOnresize />
+        <CheckOffset id={this.state.changeId} />
         {/*<CheckPromise id={this.state.changeId} />*/}
         <button onClick={(e) => {
           this.setState({changeId: this.state.changeId + 1})
@@ -57,7 +57,7 @@ function CheckOnresize(props) {
 }
 
 function CheckOffset(props) {
-  const {element, offset} = useOffset([props.id]);
+  const {element, offset} = useOffset();
   useEffect(() => {
     console.log('offset', offset);
     // console.log('a', element);

@@ -1,7 +1,7 @@
 /**
  * @file the context of react hook
  */
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { isFunction, isEqual } from 'lodash';
 import { hasProperty } from '../../utils/tools';
 
