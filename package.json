@@ -12,7 +12,7 @@
     "build": "tsc",
     "publish": "sh ./bin/publish.sh",
     "debug": "gulp compiler",
-    "eslint": "eslint --ext .tsx,.ts --fix ./src command"
+    "eslint": "eslint --ext .tsx,.ts --fix ./src"
   },
   "husky": {
     "hooks": {

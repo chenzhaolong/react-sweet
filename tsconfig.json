@@ -13,15 +13,13 @@
      "noFallthroughCasesInSwitch": true,
      "moduleResolution": "node",
      "rootDirs": [
-       "src",
-       "command"
+       "src"
      ],
     "esModuleInterop": true,
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true
   },
   "include": [
-    "command/**/*",
     "src/**/*"
   ],
   "exclude": [

@@ -57,19 +57,24 @@ function CheckOnresize(props) {
 }
 
 function CheckOffset(props) {
-  const {element, offset} = useOffset();
+  const [width, setWidth] = useState(100);
+  const {element, offset} = useOffset([width, props.id]);
   useEffect(() => {
     console.log('offset', offset);
+    console.log('width', width);
     // console.log('a', element);
   });
   return (
-    <div style={{width: '100px', height: '300px', marginTop: `${props.id}px`}}
+    <div style={{width: width + 'px', height: '300px', marginTop: `${props.id}px`}}
          ref={ele => element.current = ele}
     >
       <li>offsetTop-{offset.offsetTop}</li>
       <li>offsetLeft-{offset.offsetLeft}</li>
       <li>offsetWidth-{offset.offsetWidth}</li>
       <li>offsetHeight-{offset.offsetHeight}</li>
+      <button onClick={e => {
+        setWidth(ele => ele + 100)
+      }}>改变width</button>
     </div>
   )
 }

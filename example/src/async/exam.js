@@ -2,7 +2,7 @@
  * @file check the async of hooks
  */
 import React, {Component, useEffect, useState, useMemo} from 'react'
-import {useFetchForMount, useFetchAll, usePolling, useRelyFetch, useLifeStatus} from '../../react-sweet/src';
+import {useFetchForMount, useFetchAll, usePolling, useRelyFetch, useFetch} from '../../react-sweet/src';
 
 export class Async extends Component {
   state = {
@@ -14,11 +14,12 @@ export class Async extends Component {
       <div>
         {/*<CheckMountFetch />*/}
         {/*<CheckFetchAll id={this.state.changeId}/>*/}
-        <CheckPolling/>
-        <CheckRely id={this.state.changeId}/>
-        <button onClick={(e) => {
-          this.setState({changeId: this.state.changeId + 2})
-        }}>点击-{this.state.changeId}</button>
+        {/*<CheckPolling/>*/}
+        {/*<CheckRely id={this.state.changeId}/>*/}
+        {/*<button onClick={(e) => {*/}
+        {/*  this.setState({changeId: this.state.changeId + 2})*/}
+        {/*}}>点击-{this.state.changeId}</button>*/}
+        <CheckUseFetch/>
       </div>
     )
   }
@@ -30,7 +31,7 @@ function fetch (params) {
   return new Promise((res, rej) => {
     setTimeout(() => {
       console.log('一次');
-      times = times + 1
+      times = times + 1;
       return res({a: {b: {c: params}},d: times})
     }, 1000);
   })
@@ -53,6 +54,27 @@ function fetch2(params) {
 }
 
 // 测试useFetchForMount
+function CheckUseFetch(props) {
+  const {response, startFetch, loading} = useFetch((params) => {
+    return fetch(params);
+  }, {
+    onSuccess: (data, setData) => {
+      console.log('data', data);
+      setData({a: 12})
+    }
+  });
+  if (loading) {
+    return <div>waiting</div>
+  } else {
+    return <div>
+      <p>结果：{JSON.stringify(response)}</p>
+      <button onClick={() => {
+        startFetch(12);
+      }}>点击</button>
+    </div>
+  }
+}
+
 function CheckMountFetch (props) {
   const response = useFetchForMount(() => {
     return fetch();
@@ -127,7 +149,7 @@ function CheckPolling (props) {
 }
 
 function CheckRely(props) {
-  const data = useLifeStatus();
+  const data = {}
   useEffect(() => {
     console.log(data)
   })
