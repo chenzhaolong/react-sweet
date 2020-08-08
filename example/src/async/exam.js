@@ -25,7 +25,7 @@ export class Async extends Component {
   }
 }
 
-let times = 0
+let times = 0;
 
 function fetch (params) {
   return new Promise((res, rej) => {
