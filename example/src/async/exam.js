@@ -13,8 +13,8 @@ export class Async extends Component {
     return (
       <div>
         {/*<CheckMountFetch />*/}
-        <CheckFetchAll id={this.state.changeId}/>
-        {/*<CheckPolling/>*/}
+        {/*<CheckFetchAll id={this.state.changeId}/>*/}
+        <CheckPolling/>
         {/*<CheckRely id={this.state.changeId}/>*/}
         <button onClick={(e) => {
           this.setState({changeId: this.state.changeId + 2})
@@ -32,7 +32,7 @@ function fetch (params) {
     setTimeout(() => {
       console.log('一次');
       times = times + 1;
-      return res({a: params + times})
+      return res({a: params + times, d: times})
     }, 1000);
   })
 }
@@ -114,47 +114,58 @@ function CheckFetchAll(props) {
 }
 
 function CheckPolling (props) {
-  const [loading, setLoading] = useState('wait');
-  const {result, start, reset} = usePolling((params) => {
+  const {response, start, reset, loading} = usePolling((params) => {
     return fetch(params);
   }, {
     terminate(response) {
       if (response.d > 10) {
-        setLoading('finish');
         return true
       } else {
         return false
       }
     },
-    timeout: 1000,
-    initValue: {a: {b: {c: ''}}}
-  });
-  const {start: action} = useRelyFetch({
-    first(params) {
-      start(0);
-      return Promise.resolve();
+    intervalTime: 1000,
+    initValue: {},
+    onSuccess(data, setData) {
+      console.log('data', data);
+      times = 0;
+      setData({a: 'success'})
     },
-    last(params) {
-      return fetch1(params)
-        .then(d => {
-          return {a: d.a + 10};
-        });
+    // limitPollingNumber: 5,
+    onCompleteByLimit(setData) {
+      console.log('到达上限');
+      setData({a: 'limit'});
+      times = 0;
     }
   });
-
-  const showData = useMemo(() => {
-    return result.a.b.c === 0 ? 'good' : 'bad'
-  }, [result.a.b.c]);
+  // const {start: action} = useRelyFetch({
+  //   first(params) {
+  //     start(0);
+  //     return Promise.resolve();
+  //   },
+  //   last(params) {
+  //     return fetch1(params)
+  //       .then(d => {
+  //         return {a: d.a + 10};
+  //       });
+  //   }
+  // });
+  //
+  // const showData = useMemo(() => {
+  //   return result.a.b.c === 0 ? 'good' : 'bad'
+  // }, [result.a.b.c]);
 
   return <div>
-    <p>结果: {showData}</p>
+    <p>结果: {response.a}</p>
     <button onClick={e => {
-      setLoading('start');
       // reset();
-      // start(0);
-      action({a: 2})
-    }} >开始轮询</button>
-    <p>当前状态: {loading}</p>
+      start(0);
+      // action({a: 2})
+    }} disabled={loading}>开始轮询</button>
+    <button onClick={() => {
+      reset({a: 'stop'})
+    }} disabled={!loading}>结束轮询</button>
+    <p>当前状态: {loading ? 'polling' : 'finish'}</p>
   </div>
 }
 
