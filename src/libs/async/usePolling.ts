@@ -16,14 +16,16 @@ interface Polling {
 }
 
 interface Options {
-  intervalTime?: number;
+  intervalTime: number;
   terminate: (data: any) => boolean;
   initValue?: any;
   onError?: (error: any) => any;
   onSuccess?: (data: any, setResponse: (data: any) => any) => void;
-  onCompleteByLimit?: (setResponse: (data: any) => any) => void;
-  limitPollingNumber: number;
-  limitPollingTime: number;
+  onCompleteByLimitNumber?: (setResponse: (data: any) => any) => void;
+  onCompleteByLimitTime?: (setResponse: (data: any) => any) => void;
+  onReset?: (setResponse: (data: any) => any) => void;
+  limitPollingNumber?: number;
+  limitPollingTime?: number;
   closeLoading?: boolean;
 }
 
@@ -34,14 +36,15 @@ function usePolling(callback: Func, options: Options): Polling {
     intervalTime = 0,
     terminate,
     initValue = {},
-    onError,
     closeLoading = false,
     limitPollingNumber,
+    limitPollingTime,
+    onError,
     onSuccess,
-    onCompleteByLimit,
-    limitPollingTime
+    onCompleteByLimitNumber,
+    onCompleteByLimitTime,
+    onReset
   } = options;
-  const timer: any = null;
 
   if (!isFunction(terminate)) {
     error('the terminate of options must be exist.');
@@ -55,106 +58,109 @@ function usePolling(callback: Func, options: Options): Polling {
 
   const [response, setResponse] = useState(initValue || {});
   const [loading, setLoading] = useState(false);
-  const pollingNumber = useRef({ number: 0, currentTime: 0 });
+  const pollingInfo = useRef({ number: 0, currentTime: 0, isStop: false, timer: null, destroy: false });
 
-  const resetData = useCallback(() => {
+  const clearTimer = useCallback((timer: any) => {
     setLoading(false);
-    pollingNumber.current.number = 0;
-    pollingNumber.current.currentTime = 0;
+    // @ts-ignore
+    timer && clearTimeout(timer);
+    pollingInfo.current.timer = null;
+    pollingInfo.current.number = 0;
+    pollingInfo.current.currentTime = 0;
   }, []);
 
-  const start = useCallback(
-    (params: any) => {
-      // 限制轮询次数
-      if (isNumber(limitPollingNumber) && pollingNumber.current.number >= limitPollingNumber) {
-        if (isFunction(onCompleteByLimit)) {
-          onCompleteByLimit(setResponse);
-        } else {
-          setResponse(initValue);
-        }
-        // @ts-ignore
-        timer && clearTimeout(timer);
-        return resetData();
-      }
-
-      // 限制轮询时间
-      if (
-        isNumber(limitPollingTime) &&
-        pollingNumber.current.currentTime > 0 &&
-        Date.now() - pollingNumber.current.currentTime > limitPollingTime
-      ) {
-        if (isFunction(onCompleteByLimit)) {
-          onCompleteByLimit(setResponse);
-        } else {
-          setResponse(initValue);
-        }
-        // @ts-ignore
-        timer && clearTimeout(timer);
-        return resetData();
-      }
-
-      !closeLoading && setLoading(true);
-      pollingNumber.current.number += 1;
-      if (pollingNumber.current.number === 1) {
-        pollingNumber.current.currentTime = Date.now();
-      }
-
-      const promise = callback(params);
-      if (!isPromise(promise)) {
-        error('the first params of input must be Promise.');
+  const start = useCallback((params: any) => {
+    // 限制轮询次数
+    if (isNumber(limitPollingNumber) && pollingInfo.current.number >= limitPollingNumber) {
+      if (isFunction(onCompleteByLimitNumber)) {
+        onCompleteByLimitNumber(setResponse);
       } else {
-        promise
-          .then((response: any) => {
-            const isNotPolling = terminate(response);
-            if (!isBoolean(isNotPolling)) {
-              error('the return of terminate must be Boolean type.');
-            }
-            if (isNotPolling) {
-              if (isFunction(onSuccess)) {
-                onSuccess(response, setResponse);
-              } else {
-                setResponse(response);
-              }
-              resetData();
-            } else {
-              // @ts-ignore
-              timer = setTimeout(() => {
-                start(params);
-              }, intervalTime);
-            }
-          })
-          .catch((e: any) => {
-            resetData();
-            if (onError && isFunction(onError)) {
-              const data = onError(e);
-              setResponse(data || {});
-            } else {
-              throw e;
-            }
-          });
+        setResponse(initValue);
       }
-    },
-    [timer]
-  );
+      return clearTimer(pollingInfo.current.timer);
+    }
 
-  const reset = useCallback(
-    (initData: any) => {
-      // @ts-ignore
-      timer && clearTimeout(timer);
-      resetData();
+    // 限制轮询时间
+    if (
+      isNumber(limitPollingTime) &&
+      pollingInfo.current.currentTime > 0 &&
+      Date.now() - pollingInfo.current.currentTime > limitPollingTime
+    ) {
+      if (isFunction(onCompleteByLimitTime)) {
+        onCompleteByLimitTime(setResponse);
+      } else {
+        setResponse(initValue);
+      }
+      return clearTimer(pollingInfo.current.timer);
+    }
+
+    !closeLoading && setLoading(true);
+    pollingInfo.current.number += 1;
+    // 第一次轮询
+    if (pollingInfo.current.number === 1) {
+      pollingInfo.current.currentTime = Date.now();
+      pollingInfo.current.isStop = false;
+    }
+
+    const promise = callback(params);
+    if (!isPromise(promise)) {
+      error('the first params of input must be Promise.');
+    } else {
+      promise
+        .then((response: any) => {
+          const isNotPolling = terminate(response);
+          if (!isBoolean(isNotPolling)) {
+            error('the return of terminate must be Boolean type.');
+          }
+          if (isNotPolling) {
+            if (isFunction(onSuccess)) {
+              onSuccess(response, setResponse);
+            } else {
+              setResponse(response);
+            }
+            clearTimer(pollingInfo.current.timer);
+          } else {
+            // 处理临界点：当触发reset时，正好发起了一条异步，此时要做拦截
+            if (pollingInfo.current.isStop) {
+              return !pollingInfo.current.destroy && clearTimer(pollingInfo.current.timer);
+            }
+            // @ts-ignore
+            pollingInfo.current.timer = setTimeout(() => {
+              start(params);
+            }, intervalTime);
+          }
+        })
+        .catch((e: any) => {
+          clearTimer(pollingInfo.current.timer);
+          if (onError && isFunction(onError)) {
+            const data = onError(e);
+            setResponse(data || {});
+          } else {
+            throw e;
+          }
+        });
+    }
+  }, []);
+
+  const reset = useCallback((initData: any) => {
+    pollingInfo.current.isStop = true;
+    clearTimer(pollingInfo.current.timer);
+    if (isFunction(onReset)) {
+      onReset(setResponse);
+    } else {
       const data = initData ? initData : initValue;
       setResponse(data);
-    },
-    [timer]
-  );
+    }
+  }, []);
 
   // 销毁时清除定时器
   useEffect(() => {
     return () => {
       console.log('destory');
-      // @ts-ignore
-      timer && clearTimeout(timer);
-      resetData();
+      pollingInfo.current.isStop = true;
+      // 防止在销毁组件时还存在一条异步请求，执行state更新
+      pollingInfo.current.destroy = true;
+      clearTimer(pollingInfo.current.timer);
     };
   }, []);
 

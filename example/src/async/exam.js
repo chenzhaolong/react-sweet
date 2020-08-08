@@ -6,7 +6,8 @@ import {useAutoFetch, usePolling, useRelyFetch, useFetch} from '../../react-swee
 
 export class Async extends Component {
   state = {
-    changeId: 0
+    changeId: 0,
+    show: true
   };
 
   render() {
@@ -14,11 +15,14 @@ export class Async extends Component {
       <div>
         {/*<CheckMountFetch />*/}
         {/*<CheckFetchAll id={this.state.changeId}/>*/}
-        <CheckPolling/>
+        {this.state.show ? <CheckPolling id={this.state.changeId} /> : null}
         {/*<CheckRely id={this.state.changeId}/>*/}
         <button onClick={(e) => {
           this.setState({changeId: this.state.changeId + 2})
         }}>点击-{this.state.changeId}</button>
+        <button onClick={() => {
+          this.setState({show: !this.state.show})
+        }}>消失/显示 checkPolling</button>
         {/*<CheckUseFetch/>*/}
       </div>
     )
@@ -124,7 +128,7 @@ function CheckPolling (props) {
         return false
       }
     },
-    intervalTime: 1000,
+    intervalTime: 0,
     initValue: {},
     onSuccess(data, setData) {
       console.log('data', data);
@@ -132,9 +136,20 @@ function CheckPolling (props) {
       setData({a: 'success'})
     },
     // limitPollingNumber: 5,
-    onCompleteByLimit(setData) {
-      console.log('到达上限');
-      setData({a: 'limit'});
+    // limitPollingTime: 6000,
+    onCompleteByLimitTime(setData) {
+      console.log('time到达上限');
+      setData({a: 'time limit'});
+      times = 0;
+    },
+    onCompleteByLimitNumber(setData) {
+      console.log('number到达上限');
+      setData({a: 'number limit'});
+      times = 0;
+    },
+    onReset(setData) {
+      console.log('stop');
+      setData({a: 'stop'});
       times = 0;
     }
   });
@@ -163,7 +178,7 @@ function CheckPolling (props) {
       // action({a: 2})
     }} disabled={loading}>开始轮询</button>
     <button onClick={() => {
-      reset({a: 'stop'})
+      reset()
     }} disabled={!loading}>结束轮询</button>
     <p>当前状态: {loading ? 'polling' : 'finish'}</p>
   </div>
