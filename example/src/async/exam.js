@@ -2,7 +2,7 @@
  * @file check the async of hooks
  */
 import React, {Component, useEffect, useState, useMemo} from 'react'
-import {useFetchForMount, useFetchAll, usePolling, useRelyFetch, useFetch} from '../../react-sweet/src';
+import {useFetchForMount, useAutoFetch, usePolling, useRelyFetch, useFetch} from '../../react-sweet/src';
 
 export class Async extends Component {
   state = {
@@ -13,13 +13,13 @@ export class Async extends Component {
     return (
       <div>
         {/*<CheckMountFetch />*/}
-        {/*<CheckFetchAll id={this.state.changeId}/>*/}
+        <CheckFetchAll id={this.state.changeId}/>
         {/*<CheckPolling/>*/}
         {/*<CheckRely id={this.state.changeId}/>*/}
-        {/*<button onClick={(e) => {*/}
-        {/*  this.setState({changeId: this.state.changeId + 2})*/}
-        {/*}}>点击-{this.state.changeId}</button>*/}
-        <CheckUseFetch/>
+        <button onClick={(e) => {
+          this.setState({changeId: this.state.changeId + 2})
+        }}>点击-{this.state.changeId}</button>
+        {/*<CheckUseFetch/>*/}
       </div>
     )
   }
@@ -32,7 +32,7 @@ function fetch (params) {
     setTimeout(() => {
       console.log('一次');
       times = times + 1;
-      return res({a: {b: {c: params}},d: times})
+      return res({a: params + times})
     }, 1000);
   })
 }
@@ -40,7 +40,7 @@ function fetch (params) {
 function fetch1(params) {
   return new Promise((res, rej) => {
     setTimeout(() => {
-      res({a: params.a})
+      res({b: params + times})
     }, 1000)
   });
 }
@@ -48,7 +48,7 @@ function fetch1(params) {
 function fetch2(params) {
   return new Promise((res, rej) => {
     setTimeout(() => {
-      res({data: params.a})
+      res({c: params + times})
     }, 500)
   });
 }
@@ -86,20 +86,30 @@ function CheckMountFetch (props) {
 }
 
 function CheckFetchAll(props) {
-  const data = useFetchAll({
-    apple: fetch(11),
-    banana: fetch(12),
-    orange: fetch(13)
+  const {response, loading} = useAutoFetch(() => {
+    console.log('fetch');
+    return Promise.all([
+      fetch(props.id),
+      fetch1(2),
+      fetch2(123),
+    ])
   }, {
-    apple: {a: {b: ''}},
-    banana: {d: ''},
-    orange: {a: {b: {c: ''}}}
-  }, [props.id]);
-  console.log('all', data);
-  return <div>
-    <p>apple: {data.apple.d}</p>
-    <p>banana: {data.banana.d}</p>
-    <p>orange: {data.orange.a.b.c}</p>
+    initValue: {apple: {}, banana: {}, orange: {}},
+    onSuccess(data, setData) {
+      const data1 = {apple: data[0], banana: data[1], orange: data[2]};
+      setData(data1);
+    },
+    onError(e) {
+      console.log(e);
+    },
+    deps: [props.id],
+    autoFetchMoment: 'update'
+  });
+  console.log('all', response);
+  return loading ? <div>loading</div> : <div>
+    <p>apple: {response.apple.a}</p>
+    <p>banana: {response.banana.b}</p>
+    <p>orange: {response.orange.c}</p>
   </div>
 }
 
