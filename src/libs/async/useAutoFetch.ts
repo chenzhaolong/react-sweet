@@ -1,7 +1,5 @@
 /**
  * @file fetch all api
- * todo: 后续为每一个key添加一个path，获取指定的数据
- * todo: 后续将每个配置项集中起来，并加上onError
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { isFunction } from 'lodash';

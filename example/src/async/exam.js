@@ -2,7 +2,7 @@
  * @file check the async of hooks
  */
 import React, {Component, useEffect, useState, useMemo} from 'react'
-import {useFetchForMount, useAutoFetch, usePolling, useRelyFetch, useFetch} from '../../react-sweet/src';
+import {useAutoFetch, usePolling, useRelyFetch, useFetch} from '../../react-sweet/src';
 
 export class Async extends Component {
   state = {
@@ -75,15 +75,15 @@ function CheckUseFetch(props) {
   }
 }
 
-function CheckMountFetch (props) {
-  const response = useFetchForMount(() => {
-    return fetch();
-  }, 'data.a.b', {});
-  console.log('response', response);
-  return <div>
-    <p>结果: {response.c}</p>
-  </div>
-}
+// function CheckMountFetch (props) {
+//   const response = useFetchForMount(() => {
+//     return fetch();
+//   }, 'data.a.b', {});
+//   console.log('response', response);
+//   return <div>
+//     <p>结果: {response.c}</p>
+//   </div>
+// }
 
 function CheckFetchAll(props) {
   const {response, loading} = useAutoFetch(() => {
