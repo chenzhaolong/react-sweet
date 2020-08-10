@@ -15,8 +15,8 @@ export class Async extends Component {
       <div>
         {/*<CheckMountFetch />*/}
         {/*<CheckFetchAll id={this.state.changeId}/>*/}
-        {this.state.show ? <CheckPolling id={this.state.changeId} /> : null}
-        {/*<CheckRely id={this.state.changeId}/>*/}
+        {/* {this.state.show ? <CheckPolling id={this.state.changeId} /> : null} */}
+        <CheckRely id={this.state.changeId}/>
         <button onClick={(e) => {
           this.setState({changeId: this.state.changeId + 2})
         }}>点击-{this.state.changeId}</button>
@@ -189,23 +189,26 @@ function CheckRely(props) {
   useEffect(() => {
     console.log(data)
   })
-  const {result, start} = useRelyFetch({
-    // 前因
-    first(params) {
+  const {response, start, loading} = useRelyFetch({
+    main(params) {
       return fetch1(params)
         .then(d => {
-          return {a: d.a + 10};
+          return {a: d.b + 10};
         });
     },
-    // 后果
-    last(params) {
-      return fetch2(params);
-    }
+    rely(params) {
+      console.log('params', params)
+      return fetch2(12);
+    },
+    paramsFn(params, )
+    initValue: {main: {}, rely: {}}
   });
   return <div>
-    <p>结果：{result.data}</p>
+    <p>状态{loading ? 'loading' : 'complete'}</p>
+    <p>main结果：{response.main.a}</p>
+    <p>rely结果：{response.rely.c}</p>
     <button onClick={e => {
-      start({a: 1});
+      start({main: 1, rely: 2});
     }}>点击-{data.status}</button>
   </div>
 }

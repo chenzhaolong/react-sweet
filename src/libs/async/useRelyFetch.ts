@@ -7,36 +7,36 @@ import { isFunction } from 'lodash';
 import { error } from '../../utils/log';
 import { isPromise } from '../../utils/tools';
 
-enum Type {
-  MAIN = 'main',
-  RELY = 'rely'
-}
-
 type Fetch = (params?: any) => Promise<any>;
 
 interface Options {
   main: Fetch; // 提供项
   rely: Fetch; // 依赖项
   initValue?: any;
-  relyParams?: (outerParams: any, innerParams: any) => any;
-  mainHandle?: (error: any, response: any, setResponse: (data: any) => any) => void;
-  relyHandle?: (error: any, response: any, setResponse: (data: any) => any) => void;
+  paramsFn?: (params: Params1) => any;
+  onSuccess?: (response: any, setResponse: (data: any) => any) => void;
+  onError?: (response: any, setResponse: (data: any) => any) => any;
   closeLoading: boolean;
 }
 
+interface Params {
+  main: any;
+  rely: any;
+}
+
+interface Params1 {
+  mainParams: any;
+  relyParams: any;
+}
+
 interface Result {
-  response: { main: any; rely: any };
-  start: (type: Type, params: any) => any;
+  response: Params;
+  start: (params: Params) => any;
   loading: boolean;
 }
 
-interface Deps {
-  main: Array<any>;
-  rely: Array<any>;
-}
-
-function useRelyFetch(options: Options, deps: Deps): Result {
-  const { main, rely, initValue = {}, relyParams, mainHandle, relyHandle, closeLoading = false } = options;
+function useRelyFetch(options: Options, deps: Array<any>): Result {
+  const { main, rely, initValue = {}, paramsFn, onSuccess, onError, closeLoading = false } = options;
   if (!isFunction(main)) {
     error('the main of options must be exist and be Promise type.');
   }
@@ -48,46 +48,11 @@ function useRelyFetch(options: Options, deps: Deps): Result {
   const [response, setResponse] = useState(initValue);
   const [loading, setLoading] = useState(false);
 
-  const mainDeps = deps.main || [];
-  const relyDeps = deps.rely || [];
-
   const loadFn = useCallback((status: boolean) => {
     !closeLoading && setLoading(status);
   }, []);
 
-  const fetchMain = useCallback((params: any) => {
-    setLoading(true);
-    const promise = main(params);
-    if (!isPromise(promise)) {
-      setLoading(false);
-      error('the options of main must be Promise for return');
-    }
-    promise
-      .then((data: any) => {
-        loadFn(false);
-        if (isFunction(mainHandle)) {
-          const setData = (res: any) => {
-            setResponse({ main: res, rely: response.rely });
-          };
-          mainHandle(null, data, setData);
-        } else {
-          setResponse({ main: data, rely: response.rely });
-        }
-      })
-      .catch((error: Error) => {
-        loadFn(false);
-        if (isFunction(mainHandle)) {
-          const setData = (res: any) => {
-            setResponse({ main: res, rely: response.rely });
-          };
-          mainHandle(error, '', setData);
-        } else {
-          throw error;
-        }
-      });
-  }, mainDeps);
-
-  const fetchRely = useCallback((params: { main: any; rely: any }) => {
+  const start = useCallback((params: Params) => {
     setLoading(true);
     const promise = main(params.main);
     if (!isPromise(promise)) {
@@ -95,32 +60,31 @@ function useRelyFetch(options: Options, deps: Deps): Result {
       error('the options of main must be Promise for return');
     }
     promise
-      .then((data: any) => {
-        const realPath = isFunction(relyParams) ? relyParams(params.rely, data) : { outer: params.rely, inner: data };
+      .then((mainData: any) => {
+        const realPath = isFunction(paramsFn)
+          ? paramsFn({ mainParams: mainData, relyParams: params.rely })
+          : { relyParams: params.rely, mainParams: mainData };
         const promise1 = rely(realPath);
         if (!isPromise(promise1)) {
           setLoading(false);
           error('the options of rely must be Promise for return');
         }
         promise1
-          .then((data1: any) => {
+          .then((relyData: any) => {
             loadFn(false);
-            if (isFunction(relyHandle)) {
-              const setData = (res: any) => {
-                setResponse({ rely: res, main: response.main });
+            if (isFunction(onSuccess)) {
+              const setData: (result: any) => void = (result: any) => {
+                setResponse({ main: mainData, rely: result });
               };
-              relyHandle(null, data, setData);
+              onSuccess(relyData, setData);
             } else {
-              setResponse({ rely: data1, main: response.main });
+              setResponse({ rely: relyData, main: mainData });
             }
           })
           .catch((error: Error) => {
             loadFn(false);
-            if (isFunction(mainHandle)) {
-              const setData = (res: any) => {
-                setResponse({ rely: res, main: response.main });
-              };
-              mainHandle(error, '', setData);
+            if (isFunction(onError)) {
+              onError(error, setResponse);
             } else {
               throw error;
             }
@@ -128,28 +92,13 @@ function useRelyFetch(options: Options, deps: Deps): Result {
       })
       .catch((error: Error) => {
         loadFn(false);
-        if (isFunction(relyHandle)) {
-          const setData = (res: any) => {
-            setResponse({ main: response.main, rely: res });
-          };
-          relyHandle(error, '', setData);
+        if (isFunction(onError)) {
+          onError(error, setResponse);
         } else {
           throw error;
         }
       });
-  }, relyDeps);
-
-  const start = useCallback((type: Type, params: any) => {
-    if (type && !params) {
-      params = type;
-      type = Type.MAIN;
-    }
-    if (type === Type.MAIN) {
-      fetchMain(params);
-    } else {
-      fetchRely(params);
-    }
-  }, []);
+  }, deps);
 
   return { response, start, loading };
 }
