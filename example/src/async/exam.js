@@ -200,14 +200,14 @@ function CheckRely(props) {
       },
       rely(params) {
         console.log('relyParams', params);
-        return fetch2(12);
+        return fetch2(params.id);
       },
       paramsFn(params) {
         return {id: props.id, status: 'yes'}
       },
       onSuccess(data, setData) {
         console.log('success', data);
-        setData({a: 'main'}, {c: 'rely'});
+        setData({a: 'main' + data.mainData.a}, {c: 'rely' + data.relyData.c});
       },
       onError(error, type, setData) {
         console.log('error', error);

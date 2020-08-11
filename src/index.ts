@@ -33,6 +33,7 @@ export { default as useAutoFetch } from './libs/async/useAutoFetch';
 export { default as usePolling } from './libs/async/usePolling';
 export { default as useFetch } from './libs/async/useFetch';
 export { default as useRelyFetch } from './libs/async/useRelyFetch';
+export { default as useUpload } from './libs/async/useUpload';
 
 /* form verify */
 export { default as useRules } from './libs/formVerify/useRules';

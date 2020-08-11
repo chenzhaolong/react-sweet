@@ -1,6 +1,5 @@
 /**
  * @file the fetch base on the dependent relationship between two api
- * todo: 该钩子的调用形式和配置项是否需要进一步优化
  */
 import { useState, useCallback } from 'react';
 import { isFunction, isObject } from 'lodash';
