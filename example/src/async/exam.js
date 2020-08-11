@@ -1,8 +1,8 @@
 /**
  * @file check the async of hooks
  */
-import React, {Component, useEffect, useState, useMemo} from 'react'
-import {useAutoFetch, usePolling, useRelyFetch, useFetch} from '../../react-sweet/src';
+import React, { Component, useEffect, useState, useMemo } from 'react';
+import { useAutoFetch, usePolling, useRelyFetch, useFetch } from '../../react-sweet/src';
 
 export class Async extends Component {
   state = {
@@ -18,64 +18,66 @@ export class Async extends Component {
         {/* {this.state.show ? <CheckPolling id={this.state.changeId} /> : null} */}
         <CheckRely id={this.state.changeId}/>
         <button onClick={(e) => {
-          this.setState({changeId: this.state.changeId + 2})
+          this.setState({ changeId: this.state.changeId + 2 });
         }}>点击-{this.state.changeId}</button>
         <button onClick={() => {
-          this.setState({show: !this.state.show})
-        }}>消失/显示 checkPolling</button>
+          this.setState({ show: !this.state.show });
+        }}>消失/显示 checkPolling
+        </button>
         {/*<CheckUseFetch/>*/}
       </div>
-    )
+    );
   }
 }
 
 let times = 0;
 
-function fetch (params) {
+function fetch(params) {
   return new Promise((res, rej) => {
     setTimeout(() => {
       console.log('一次');
       times = times + 1;
-      return res({a: params + times, d: times})
+      return res({ a: params + times, d: times });
     }, 1000);
-  })
+  });
 }
 
 function fetch1(params) {
   return new Promise((res, rej) => {
     setTimeout(() => {
-      res({b: params + times})
-    }, 1000)
+      res({ b: params + times });
+    }, 1000);
   });
 }
 
 function fetch2(params) {
   return new Promise((res, rej) => {
     setTimeout(() => {
-      res({c: params + times})
-    }, 500)
+      res({ c: params + times });
+    }, 500);
   });
 }
 
 // 测试useFetchForMount
 function CheckUseFetch(props) {
-  const {response, startFetch, loading} = useFetch((params) => {
+  const { response, startFetch, loading } = useFetch((params) => {
     return fetch(params);
   }, {
     onSuccess: (data, setData) => {
       console.log('data', data);
-      setData({a: 12})
+      setData({ a: 12 });
     }
   });
   if (loading) {
-    return <div>waiting</div>
+    return <div>waiting</div>;
   } else {
     return <div>
       <p>结果：{JSON.stringify(response)}</p>
       <button onClick={() => {
         startFetch(12);
-      }}>点击</button>
-    </div>
+      }}>点击
+      </button>
+    </div>;
   }
 }
 
@@ -90,17 +92,17 @@ function CheckUseFetch(props) {
 // }
 
 function CheckFetchAll(props) {
-  const {response, loading} = useAutoFetch(() => {
+  const { response, loading } = useAutoFetch(() => {
     console.log('fetch');
     return Promise.all([
       fetch(props.id),
       fetch1(2),
-      fetch2(123),
-    ])
+      fetch2(123)
+    ]);
   }, {
-    initValue: {apple: {}, banana: {}, orange: {}},
+    initValue: { apple: {}, banana: {}, orange: {} },
     onSuccess(data, setData) {
-      const data1 = {apple: data[0], banana: data[1], orange: data[2]};
+      const data1 = { apple: data[0], banana: data[1], orange: data[2] };
       setData(data1);
     },
     onError(e) {
@@ -114,18 +116,18 @@ function CheckFetchAll(props) {
     <p>apple: {response.apple.a}</p>
     <p>banana: {response.banana.b}</p>
     <p>orange: {response.orange.c}</p>
-  </div>
+  </div>;
 }
 
-function CheckPolling (props) {
-  const {response, start, reset, loading} = usePolling((params) => {
+function CheckPolling(props) {
+  const { response, start, reset, loading } = usePolling((params) => {
     return fetch(params);
   }, {
     terminate(response) {
       if (response.d > 10) {
-        return true
+        return true;
       } else {
-        return false
+        return false;
       }
     },
     intervalTime: 0,
@@ -133,23 +135,23 @@ function CheckPolling (props) {
     onSuccess(data, setData) {
       console.log('data', data);
       times = 0;
-      setData({a: 'success'})
+      setData({ a: 'success' });
     },
     // limitPollingNumber: 5,
     // limitPollingTime: 6000,
     onCompleteByLimitTime(setData) {
       console.log('time到达上限');
-      setData({a: 'time limit'});
+      setData({ a: 'time limit' });
       times = 0;
     },
     onCompleteByLimitNumber(setData) {
       console.log('number到达上限');
-      setData({a: 'number limit'});
+      setData({ a: 'number limit' });
       times = 0;
     },
     onReset(setData) {
       console.log('stop');
-      setData({a: 'stop'});
+      setData({ a: 'stop' });
       times = 0;
     }
   });
@@ -176,39 +178,50 @@ function CheckPolling (props) {
       // reset();
       start(0);
       // action({a: 2})
-    }} disabled={loading}>开始轮询</button>
+    }} disabled={loading}>开始轮询
+    </button>
     <button onClick={() => {
-      reset()
-    }} disabled={!loading}>结束轮询</button>
+      reset();
+    }} disabled={!loading}>结束轮询
+    </button>
     <p>当前状态: {loading ? 'polling' : 'finish'}</p>
-  </div>
+  </div>;
 }
 
 function CheckRely(props) {
-  const data = {}
-  useEffect(() => {
-    console.log(data)
-  })
-  const {response, start, loading} = useRelyFetch({
-    main(params) {
-      return fetch1(params)
-        .then(d => {
-          return {a: d.b + 10};
-        });
-    },
-    rely(params) {
-      console.log('params', params)
-      return fetch2(12);
-    },
-    paramsFn(params, )
-    initValue: {main: {}, rely: {}}
-  });
+  const { response, start, loading } = useRelyFetch(
+    {
+      main(params) {
+        console.log('mainParams', params);
+        return fetch1(params)
+          .then(d => {
+            return { a: d.b + 10 };
+          });
+      },
+      rely(params) {
+        console.log('relyParams', params);
+        return fetch2(12);
+      },
+      paramsFn(params) {
+        return {id: props.id, status: 'yes'}
+      },
+      onSuccess(data, setData) {
+        console.log('success', data);
+        setData({a: 'main'}, {c: 'rely'});
+      },
+      onError(error, type, setData) {
+        console.log('error', error);
+        setData('error')
+      },
+      initValue: { mainData: {}, relyData: {} }
+    }, [props.id]);
   return <div>
     <p>状态{loading ? 'loading' : 'complete'}</p>
-    <p>main结果：{response.main.a}</p>
-    <p>rely结果：{response.rely.c}</p>
+    <p>main结果：{response.mainData.a}</p>
+    <p>rely结果：{response.relyData.c}</p>
     <button onClick={e => {
-      start({main: 1, rely: 2});
-    }}>点击-{data.status}</button>
-  </div>
+      start({ mainParams: 1, relyParams: 2 });
+    }}>点击
+    </button>
+  </div>;
 }
