@@ -16,7 +16,8 @@ export class Async extends Component {
         {/*<CheckMountFetch />*/}
         {/*<CheckFetchAll id={this.state.changeId}/>*/}
         {/* {this.state.show ? <CheckPolling id={this.state.changeId} /> : null} */}
-        <CheckRely id={this.state.changeId}/>
+        {/*<CheckRely id={this.state.changeId}/>*/}
+        <FileCom/>
         <button onClick={(e) => {
           this.setState({ changeId: this.state.changeId + 2 });
         }}>点击-{this.state.changeId}</button>
@@ -224,4 +225,14 @@ function CheckRely(props) {
     }}>点击
     </button>
   </div>;
+}
+
+function FileCom(props) {
+  return <div>
+    <input type="file" name="file" id="id_file" onChange={e => {
+      const files = e.target.files;
+      console.log('file', files[0]);
+      console.log('file1', files[0].slice(0, files[0].size - 1))
+    }}/>
+  </div>
 }
