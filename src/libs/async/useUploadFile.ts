@@ -1,11 +1,11 @@
 /**
  * @file upload the file
  */
-import { useState, useCallback } from 'react';
-import { isFunction, isObject, isNumber } from 'lodash';
+import { useState, useCallback, useMemo } from 'react';
+import { isFunction, isObject } from 'lodash';
 import { hasProperty, isPromise } from '../../utils/tools';
 import { error } from '../../utils/log';
-import { Md5 } from 'ts-md5/dist/md5';
+import { Upload } from '../../utils/upload';
 
 interface Options {
   openChunk?: boolean;
@@ -13,8 +13,7 @@ interface Options {
   limitFileSize?: number;
   chunkSize: number;
   timeout?: number;
-  openPercentage?: boolean;
-  threads?: number;
+  // threads?: number;
   onSuccess?: (response: any, setResponse: (data: any) => void) => void;
   onError?: (error: any, setResponse: (data: any) => void) => void;
   onPause?: (setResponse: (data: any) => void) => void;
@@ -36,11 +35,12 @@ interface Result {
 
 enum Status {
   START = 'start',
-  UPLOADING = 'upload',
+  UPLOADING = 'uploading',
   SUCCESS = 'success',
   FAIL = 'fail',
   PAUSE = 'pause',
-  STOP = 'stop'
+  STOP = 'stop',
+  UNSTART = 'unstart'
 }
 
 type UploadFn = (chunk: number, content: string, md5Value: string, file: File) => Promise<any>;
@@ -81,8 +81,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
     limitFileSize,
     chunkSize,
     timeout,
-    openPercentage = false,
-    threads,
+    // threads,
     onSuccess,
     onError,
     onPause,
@@ -93,70 +92,85 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
     initValue
   } = options;
 
-  const [response, setResponse] = useState(initValue || {});
+  const [response, setResponse] = useState({ status: Status.UNSTART, data: initValue || {}, percentage: 0 });
   const [loading, setLoading] = useState(false);
   const realDeps = deps || [];
 
-  const getMd5 = useCallback((file) => {
-    const fileReader = new FileReader();
-    return new Promise((resolve, reject) => {
-      if (useMd5) {
-        fileReader.readAsBinaryString(file);
-        fileReader.onload = () => {
-          const md5 = new Md5();
-          // @ts-ignore
-          md5.appendStr(this.result);
-          const result = md5.end();
-          resolve(result);
-        };
-        fileReader.onerror = (e: any) => {
-          reject(e);
-        };
-      } else {
-        resolve('');
-      }
-    });
-  }, []);
-
-  const checkFileSize = useCallback((fileSize: number) => {
-    if (isNumber(limitFileSize) && isNumber(fileSize)) {
-      return fileSize > limitFileSize;
-    }
-    return true;
-  }, []);
-
   const handleSuccess = useCallback((data: any) => {
+    const setData = (result: any) => {
+      setResponse({
+        status: Status.SUCCESS,
+        data: result,
+        percentage: 100
+      });
+    };
     setLoading(false);
     if (isFunction(onSuccess)) {
-      onSuccess(data, setResponse);
+      onSuccess(data, setData);
     } else {
-      setResponse(data);
+      setData(data);
     }
   }, []);
 
   const handleError = useCallback((error: any) => {
+    const setData = (error: any) => {
+      setResponse({
+        status: Status.FAIL,
+        data: error,
+        percentage: 0
+      });
+    };
     setLoading(false);
     if (isFunction(onError)) {
-      onError(error, setResponse);
+      onError(error, setData);
     } else {
       throw error;
     }
   }, []);
 
+  const upload = useCallback((paramsList: Array<any>, time, file) => {
+    const params = paramsList[time];
+    const promise = uploadFn(params.chunk, params.content, params.md5, file);
+    checkPromise(promise);
+    promise
+      .then((data: any) => {
+        if (time === paramsList.length - 1) {
+          handleSuccess(data);
+        } else {
+          setResponse({ status: Status.UPLOADING, data, percentage: Math.ceil(time / paramsList.length) });
+          setTimeout(() => {
+            upload(paramsList, time + 1, file);
+          }, timeout || 0);
+        }
+      })
+      .catch((e: any) => {
+        handleError(e);
+      });
+  }, []);
+
   const start = useCallback((file: any) => {
     checkFile(file);
-    setLoading(true);
+    if (Upload.checkFileOverSize(file.size, limitFileSize)) {
+      console.warn('upload stop, because the fileSize is over the limitFileSize');
+      return;
+    }
+    const chunkNumber = Upload.getChunkNumber(file, chunkSize);
 
-    if (openChunk) {
-    } else {
-      if (checkFileSize(file.size)) {
-        console.warn('the fileSize is over the limitFileSize');
-        return;
-      }
-      const content = file.silce(0, file.size - 1);
-      getMd5(content)
-        .then((md5Value: any) => {
-          const promise = uploadFn(1, content, md5Value, file);
+    setLoading(true);
+    // 每次开始上传都要重置上次的残留数据
+    setResponse({ status: Status.START, data: initValue || {}, percentage: 0 });
+
+    Upload.getMd5(file, useMd5)
+      .then((md5Value: any) => {
+        if (openChunk && chunkNumber > 1) {
+          if (Upload.checkChunkOverNumber(chunkNumber, limitChunkNumber)) {
+            console.warn('upload stop, because the chunkNumber is over the limitChunkNumber');
+            return;
+          }
+          const paramsList = Upload.getUploadParams(file, chunkNumber, chunkSize, md5Value);
+          upload(paramsList, 0, file);
+        } else {
+          const promise = uploadFn(1, file, md5Value, file);
           checkPromise(promise);
           promise
             .then((data: any) => {
@@ -165,11 +179,11 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
             .catch((e: any) => {
               handleError(e);
             });
-        })
-        .catch((e) => {
-          handleError(e);
-        });
-    }
+        }
+      })
+      .catch((e) => {
+        handleError(e);
+      });
   }, realDeps);
 
   const terminate = useCallback(() => {}, realDeps);
