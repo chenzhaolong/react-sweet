@@ -1,7 +1,7 @@
 /**
  * @file upload the file
  */
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { isFunction, isObject } from 'lodash';
 import { hasProperty, isPromise } from '../../utils/tools';
 import { error } from '../../utils/log';
@@ -16,9 +16,9 @@ interface Options {
   // threads?: number;
   onSuccess?: (response: any, setResponse: (data: any) => void) => void;
   onError?: (error: any, setResponse: (data: any) => void) => void;
-  onPause?: (setResponse: (data: any) => void) => void;
   onTerminate?: (setResponse: (data: any) => void) => void;
-  onProgress?: (setResponse: (data: any) => void) => void;
+  onPause?: () => void;
+  onProgress?: () => void;
   deps?: Array<any>;
   useMd5?: boolean;
   initValue?: any;
@@ -39,11 +39,26 @@ enum Status {
   SUCCESS = 'success',
   FAIL = 'fail',
   PAUSE = 'pause',
-  STOP = 'stop',
+  TERMINATE = 'terminate',
   UNSTART = 'unstart'
 }
 
-type UploadFn = (chunk: number, content: string, md5Value: string, file: File) => Promise<any>;
+interface UploadParams {
+  chunk: number;
+  content: Blob;
+  md5: string;
+}
+
+interface Store {
+  paramsList: ArrayUploadParams;
+  time: number;
+  isPause: boolean;
+  file: any;
+}
+
+type ArrayUploadParams = Array<UploadParams>;
+
+type UploadFn = (chunk: number, content: Blob, md5Value: string, file: File) => Promise<any>;
 
 function checkFn(uploadFn: any, options: any) {
   if (!isFunction(uploadFn)) {
@@ -73,6 +88,8 @@ function checkPromise(promise: any): void {
   }
 }
 
+const defaultValue = { paramsList: [], time: 0, isPause: false, file: {} };
+
 function useUploadFile(uploadFn: UploadFn, options: Options): Result {
   checkFn(uploadFn, options);
   const {
@@ -95,6 +112,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
   const [response, setResponse] = useState({ status: Status.UNSTART, data: initValue || {}, percentage: 0 });
   const [loading, setLoading] = useState(false);
   const realDeps = deps || [];
+  const store: { current: Store } = useRef(defaultValue);
 
   const handleSuccess = useCallback((data: any) => {
     const setData = (result: any) => {
@@ -105,6 +123,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       });
     };
     setLoading(false);
+    store.current = defaultValue;
     if (isFunction(onSuccess)) {
       onSuccess(data, setData);
     } else {
@@ -112,7 +131,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
     }
   }, []);
 
-  const handleError = useCallback((error: any) => {
+  const handleError = useCallback((error: any, isWarn?: boolean) => {
     const setData = (error: any) => {
       setResponse({
         status: Status.FAIL,
@@ -121,6 +140,10 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       });
     };
     setLoading(false);
+    store.current = defaultValue;
+    if (isWarn) {
+      return setData(error);
+    }
     if (isFunction(onError)) {
       onError(error, setData);
     } else {
@@ -128,7 +151,12 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
     }
   }, []);
 
-  const upload = useCallback((paramsList: Array<any>, time, file) => {
+  const upload = useCallback(() => {
+    const file = store.current.file;
+    const { paramsList, time, isPause } = store.current;
+    if (paramsList.length === 0 || isPause) {
+      return;
+    }
     const params = paramsList[time];
     const promise = uploadFn(params.chunk, params.content, params.md5, file);
     checkPromise(promise);
@@ -137,9 +165,15 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
         if (time === paramsList.length - 1) {
           handleSuccess(data);
         } else {
-          setResponse({ status: Status.UPLOADING, data, percentage: Math.ceil(time / paramsList.length) });
+          store.current.time = time + 1;
+          setResponse({
+            status: Status.UPLOADING,
+            data,
+            percentage: Math.ceil(store.current.time / paramsList.length)
+          });
+          isFunction(onProgress) && onProgress();
           setTimeout(() => {
-            upload(paramsList, time + 1, file);
+            upload();
           }, timeout || 0);
         }
       })
@@ -165,10 +199,15 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
         if (openChunk && chunkNumber > 1) {
           if (Upload.checkChunkOverNumber(chunkNumber, limitChunkNumber)) {
             console.warn('upload stop, because the chunkNumber is over the limitChunkNumber');
-            return;
+            return handleError(initValue || {}, true);
           }
-          const paramsList = Upload.getUploadParams(file, chunkNumber, chunkSize, md5Value);
-          upload(paramsList, 0, file);
+          store.current = {
+            paramsList: Upload.getUploadParams(file, chunkNumber, chunkSize, md5Value),
+            time: 0,
+            file: file,
+            ...store.current
+          };
+          upload();
         } else {
           const promise = uploadFn(1, file, md5Value, file);
           checkPromise(promise);
@@ -186,11 +225,37 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       });
   }, realDeps);
 
-  const terminate = useCallback(() => {}, realDeps);
+  const terminate = useCallback(() => {
+    const setData = (data: any) => {
+      setResponse({
+        status: Status.TERMINATE,
+        data: data,
+        percentage: 0
+      });
+    };
+    setLoading(false);
+    store.current = defaultValue;
+    if (isFunction(onTerminate)) {
+      onTerminate(setData);
+    } else {
+      setData(initValue || {});
+    }
+  }, realDeps);
 
-  const pause = useCallback(() => {}, realDeps);
+  const pause = useCallback(() => {
+    store.current.isPause = true;
+    setLoading(false);
+    setResponse({ ...response, status: Status.PAUSE });
+    if (isFunction(onPause)) {
+      onPause();
+    }
+  }, realDeps);
 
-  const resume = useCallback(() => {}, realDeps);
+  const resume = useCallback(() => {
+    setLoading(true);
+    store.current.isPause = false;
+    upload();
+  }, realDeps);
 
   return { response, loading, start, pause, resume, terminate };
 }
