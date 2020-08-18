@@ -3,7 +3,7 @@
  */
 import { Md5 } from 'ts-md5';
 import { isNumber, isFunction, isObject } from 'lodash';
-import { error } from './log';
+import { error, warning } from './log';
 import { hasProperty } from './tools';
 
 export class Upload {
@@ -69,10 +69,10 @@ export class Upload {
 
   static checkFile(file: any) {
     if (!file) {
-      error('file is undefined when get start in the useUploadFile.');
+      return warning('file is undefined when get start in the useUploadFile.');
     }
     if (!(file instanceof File)) {
-      error('file is not the instance of File.');
+      return warning('file is not the instance of File.');
     }
   }
 

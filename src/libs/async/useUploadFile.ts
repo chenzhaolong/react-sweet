@@ -147,7 +147,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
           setResponse({
             status: Status.UPLOADING,
             data,
-            percentage: Math.ceil(store.current.time / paramsList.length)
+            percentage: Math.ceil((store.current.time / paramsList.length) * 100)
           });
           isFunction(onProgress) && onProgress(data);
           setTimeout(() => {
@@ -180,10 +180,10 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
             return handleError(initValue || {}, true);
           }
           store.current = {
+            ...store.current,
             paramsList: Upload.getUploadParams(file, chunkNumber, chunkSize, md5Value),
             time: 0,
-            file: file,
-            ...store.current
+            file: file
           };
           upload();
         } else {

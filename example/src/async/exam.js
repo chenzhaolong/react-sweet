@@ -2,7 +2,7 @@
  * @file check the async of hooks
  */
 import React, { Component, useEffect, useState, useMemo } from 'react';
-import { useAutoFetch, usePolling, useRelyFetch, useFetch } from '../../react-sweet/src';
+import { useAutoFetch, usePolling, useRelyFetch, useFetch, useUploadFile } from '../../react-sweet/src';
 
 export class Async extends Component {
   state = {
@@ -18,13 +18,13 @@ export class Async extends Component {
         {/* {this.state.show ? <CheckPolling id={this.state.changeId} /> : null} */}
         {/*<CheckRely id={this.state.changeId}/>*/}
         <FileCom/>
-        <button onClick={(e) => {
-          this.setState({ changeId: this.state.changeId + 2 });
-        }}>点击-{this.state.changeId}</button>
-        <button onClick={() => {
-          this.setState({ show: !this.state.show });
-        }}>消失/显示 checkPolling
-        </button>
+        {/*<button onClick={(e) => {*/}
+        {/*  this.setState({ changeId: this.state.changeId + 2 });*/}
+        {/*}}>点击-{this.state.changeId}</button>*/}
+        {/*<button onClick={() => {*/}
+        {/*  this.setState({ show: !this.state.show });*/}
+        {/*}}>消失/显示 checkPolling*/}
+        {/*</button>*/}
         {/*<CheckUseFetch/>*/}
       </div>
     );
@@ -227,12 +227,40 @@ function CheckRely(props) {
   </div>;
 }
 
+function uploadFetch (params) {
+  return new Promise((res, rej) => {
+    console.log('params:', params);
+    setTimeout(() => {
+      res({success: true});
+    }, 1000);
+  });
+}
+
 function FileCom(props) {
+  const {
+    response,
+    start,
+    loading,
+    pause,
+    resume,
+    terminate
+  } = useUploadFile((chunk, content, md5, file) => {
+    return uploadFetch({times: chunk, content, md5})
+  }, {
+    chunkSize: 500,
+    limitChunkNumber: 10
+  });
+
+  useEffect(() => {
+    console.log('response', response)
+  });
+
   return <div>
     <input type="file" name="file" id="id_file" onChange={e => {
       const files = e.target.files;
-      console.log('file', files[0]);
-      console.log('file1', files[0].slice(0, files[0].size - 1))
+      start(files[0]);
     }}/>
+    <div>{loading ? response.status : '还没开始upload'}</div>
+    <div>进度{response.percentage}</div>
   </div>
 }
