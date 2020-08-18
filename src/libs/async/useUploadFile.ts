@@ -2,8 +2,8 @@
  * @file upload the file
  */
 import { useState, useCallback, useRef } from 'react';
-import { isFunction, isObject } from 'lodash';
-import { hasProperty, isPromise } from '../../utils/tools';
+import { isFunction } from 'lodash';
+import { isPromise } from '../../utils/tools';
 import { error } from '../../utils/log';
 import { Upload } from '../../utils/upload';
 
@@ -18,7 +18,7 @@ interface Options {
   onError?: (error: any, setResponse: (data: any) => void) => void;
   onTerminate?: (setResponse: (data: any) => void) => void;
   onPause?: () => void;
-  onProgress?: () => void;
+  onProgress?: (data: any) => void;
   deps?: Array<any>;
   useMd5?: boolean;
   initValue?: any;
@@ -60,28 +60,6 @@ type ArrayUploadParams = Array<UploadParams>;
 
 type UploadFn = (chunk: number, content: Blob, md5Value: string, file: File) => Promise<any>;
 
-function checkFn(uploadFn: any, options: any) {
-  if (!isFunction(uploadFn)) {
-    error('the first params must be function in useUpload.');
-  }
-  if (!isObject(options)) {
-    error('the second params must be object in useUpload.');
-  } else {
-    if (!hasProperty(options, 'chunkSize', 'number')) {
-      error('the chunkSize of options must exist and must be number in useUpload.');
-    }
-  }
-}
-
-function checkFile(file: any): void {
-  if (!file) {
-    error('file is undefined when get start in the useUploadFile.');
-  }
-  if (!(file instanceof File)) {
-    error('file is not the instance of File.');
-  }
-}
-
 function checkPromise(promise: any): void {
   if (!isPromise(promise)) {
     error('the first input params must be promise.');
@@ -91,7 +69,7 @@ function checkPromise(promise: any): void {
 const defaultValue = { paramsList: [], time: 0, isPause: false, file: {} };
 
 function useUploadFile(uploadFn: UploadFn, options: Options): Result {
-  checkFn(uploadFn, options);
+  Upload.checkFn(uploadFn, options);
   const {
     openChunk = true,
     limitChunkNumber,
@@ -152,8 +130,8 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
   }, []);
 
   const upload = useCallback(() => {
-    const file = store.current.file;
-    const { paramsList, time, isPause } = store.current;
+    // const file = store.current.file;
+    const { paramsList, time, isPause, file } = store.current;
     if (paramsList.length === 0 || isPause) {
       return;
     }
@@ -171,7 +149,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
             data,
             percentage: Math.ceil(store.current.time / paramsList.length)
           });
-          isFunction(onProgress) && onProgress();
+          isFunction(onProgress) && onProgress(data);
           setTimeout(() => {
             upload();
           }, timeout || 0);
@@ -183,7 +161,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
   }, []);
 
   const start = useCallback((file: any) => {
-    checkFile(file);
+    Upload.checkFile(file);
     if (Upload.checkFileOverSize(file.size, limitFileSize)) {
       console.warn('upload stop, because the fileSize is over the limitFileSize');
       return;

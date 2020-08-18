@@ -2,7 +2,9 @@
  * @file the utils of upload
  */
 import { Md5 } from 'ts-md5';
-import { isNumber } from 'lodash';
+import { isNumber, isFunction, isObject } from 'lodash';
+import { error } from './log';
+import { hasProperty } from './tools';
 
 export class Upload {
   static getMd5(file: File, useMd5: boolean) {
@@ -63,5 +65,27 @@ export class Upload {
       });
     }
     return paramsList;
+  }
+
+  static checkFile(file: any) {
+    if (!file) {
+      error('file is undefined when get start in the useUploadFile.');
+    }
+    if (!(file instanceof File)) {
+      error('file is not the instance of File.');
+    }
+  }
+
+  static checkFn(uploadFn: any, options: any) {
+    if (!isFunction(uploadFn)) {
+      error('the first params must be function in useUploadFile.');
+    }
+    if (!isObject(options)) {
+      error('the second params must be object in useUploadFile.');
+    } else {
+      if (!hasProperty(options, 'chunkSize', 'number')) {
+        error('the chunkSize of options must exist and must be number in useUploadFile.');
+      }
+    }
   }
 }
