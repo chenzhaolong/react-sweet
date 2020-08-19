@@ -1,10 +1,11 @@
 /**
  * @file upload the file
+ * todo: 后续支持根据分片个数来划分文件体积，然后上传的能力
  */
 import { useState, useCallback, useRef } from 'react';
 import { isFunction } from 'lodash';
 import { isPromise } from '../../utils/tools';
-import { error } from '../../utils/log';
+import { error, warning } from '../../utils/log';
 import { Upload } from '../../utils/upload';
 
 interface Options {
@@ -12,7 +13,7 @@ interface Options {
   limitChunkNumber?: number;
   limitFileSize?: number;
   chunkSize: number;
-  timeout?: number;
+  interval?: number;
   // threads?: number;
   onSuccess?: (response: any, setResponse: (data: any) => void) => void;
   onError?: (error: any, setResponse: (data: any) => void) => void;
@@ -22,6 +23,8 @@ interface Options {
   deps?: Array<any>;
   useMd5?: boolean;
   initValue?: any;
+  timeout: number;
+  onTimeout: (data: any, setResponse: (data: any) => void) => void;
 }
 
 interface Result {
@@ -40,7 +43,8 @@ enum Status {
   FAIL = 'fail',
   PAUSE = 'pause',
   TERMINATE = 'terminate',
-  UNSTART = 'unstart'
+  UNSTART = 'unstart',
+  TIMEOUT = 'timeout'
 }
 
 interface UploadParams {
@@ -54,6 +58,7 @@ interface Store {
   time: number;
   isPause: boolean;
   file: any;
+  startTime: number;
 }
 
 type ArrayUploadParams = Array<UploadParams>;
@@ -66,7 +71,7 @@ function checkPromise(promise: any): void {
   }
 }
 
-const defaultValue = { paramsList: [], time: 0, isPause: false, file: {} };
+const defaultValue = { paramsList: [], time: 0, isPause: false, file: {}, startTime: 0 };
 
 function useUploadFile(uploadFn: UploadFn, options: Options): Result {
   Upload.checkFn(uploadFn, options);
@@ -75,16 +80,18 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
     limitChunkNumber,
     limitFileSize,
     chunkSize,
-    timeout,
+    interval,
     // threads,
     onSuccess,
     onError,
     onPause,
     onTerminate,
     onProgress,
+    onTimeout,
     deps,
     useMd5 = false,
-    initValue
+    initValue,
+    timeout
   } = options;
 
   const [response, setResponse] = useState({ status: Status.UNSTART, data: initValue || {}, percentage: 0 });
@@ -129,9 +136,28 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
     }
   }, []);
 
+  const handleTimeout = useCallback((data: any) => {
+    const setData = (result: any) => {
+      setResponse({
+        status: Status.TIMEOUT,
+        data: result,
+        percentage: 0
+      });
+    };
+    warning(
+      'the upload is timeout, cause timeout maybe you invoke pause to stop stop and after a few second invoke resume for going on.'
+    );
+    setLoading(false);
+    store.current = defaultValue;
+    if (isFunction(onTimeout)) {
+      onTimeout(data, setData);
+    } else {
+      setData(data);
+    }
+  }, []);
+
   const upload = useCallback(() => {
-    // const file = store.current.file;
-    const { paramsList, time, isPause, file } = store.current;
+    const { paramsList, time, isPause, file, startTime } = store.current;
     if (paramsList.length === 0 || isPause) {
       return;
     }
@@ -143,16 +169,23 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
         if (time === paramsList.length - 1) {
           handleSuccess(data);
         } else {
+          if (Upload.checkUploadTimeOut(startTime, Date.now(), timeout)) {
+            handleTimeout(data);
+            return;
+          }
+
           store.current.time = time + 1;
           setResponse({
             status: Status.UPLOADING,
             data,
             percentage: Math.ceil((store.current.time / paramsList.length) * 100)
           });
+
           isFunction(onProgress) && onProgress(data);
+
           setTimeout(() => {
             upload();
-          }, timeout || 0);
+          }, interval || 0);
         }
       })
       .catch((e: any) => {
@@ -165,7 +198,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       return;
     }
     if (Upload.checkFileOverSize(file.size, limitFileSize)) {
-      console.warn('upload stop, because the fileSize is over the limitFileSize');
+      console.warn(`upload stop, because the fileSize ${file.size} is over the limitFileSize ${limitFileSize}`);
       return;
     }
     const chunkNumber = Upload.getChunkNumber(file, chunkSize);
@@ -187,7 +220,8 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
             ...store.current,
             paramsList: Upload.getUploadParams(file, chunkNumber, chunkSize, md5Value),
             time: 0,
-            file: file
+            file: file,
+            startTime: Date.now()
           };
           upload();
         } else {

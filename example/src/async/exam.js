@@ -249,7 +249,9 @@ function FileCom(props) {
   }, {
     chunkSize: 500,
     limitChunkNumber: 60,
-    initValue: {success: ''}
+    limitFileSize: 500 * 1024,
+    initValue: {success: ''},
+    timeout: 10000
   });
 
   useEffect(() => {

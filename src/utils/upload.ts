@@ -95,4 +95,11 @@ export class Upload {
       }
     }
   }
+
+  static checkUploadTimeOut(startTime: number, endTime: number, timeout: number) {
+    if (isNumber(timeout)) {
+      return endTime - startTime > timeout;
+    }
+    return false;
+  }
 }
