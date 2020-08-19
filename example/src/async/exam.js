@@ -231,7 +231,7 @@ function uploadFetch (params) {
   return new Promise((res, rej) => {
     console.log('params:', params);
     setTimeout(() => {
-      res({success: true});
+      res({success: 'success'});
     }, 1000);
   });
 }
@@ -244,11 +244,12 @@ function FileCom(props) {
     pause,
     resume,
     terminate
-  } = useUploadFile((chunk, content, md5, file) => {
+  } = useUploadFile((chunk, content, md5, file, total) => {
     return uploadFetch({times: chunk, content, md5})
   }, {
     chunkSize: 500,
-    limitChunkNumber: 10
+    limitChunkNumber: 60,
+    initValue: {success: ''}
   });
 
   useEffect(() => {
@@ -256,11 +257,11 @@ function FileCom(props) {
   });
 
   return <div>
-    <input type="file" name="file" id="id_file" onChange={e => {
+    <input type="file" name="file" id="id_file" onInput={e => {
       const files = e.target.files;
       start(files[0]);
     }}/>
-    <div>{loading ? response.status : '还没开始upload'}</div>
+    <div>{loading ? response.status : response.data.success || '还没开始upload'}</div>
     <div>进度{response.percentage}</div>
   </div>
 }

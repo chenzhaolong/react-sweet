@@ -58,7 +58,7 @@ interface Store {
 
 type ArrayUploadParams = Array<UploadParams>;
 
-type UploadFn = (chunk: number, content: Blob, md5Value: string, file: File) => Promise<any>;
+type UploadFn = (chunk: number, content: Blob, md5Value: string, file: File, total?: number) => Promise<any>;
 
 function checkPromise(promise: any): void {
   if (!isPromise(promise)) {
@@ -136,7 +136,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       return;
     }
     const params = paramsList[time];
-    const promise = uploadFn(params.chunk, params.content, params.md5, file);
+    const promise = uploadFn(params.chunk, params.content, params.md5, file, paramsList.length);
     checkPromise(promise);
     promise
       .then((data: any) => {
@@ -161,7 +161,9 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
   }, []);
 
   const start = useCallback((file: any) => {
-    Upload.checkFile(file);
+    if (!Upload.checkFile(file)) {
+      return;
+    }
     if (Upload.checkFileOverSize(file.size, limitFileSize)) {
       console.warn('upload stop, because the fileSize is over the limitFileSize');
       return;
@@ -176,7 +178,9 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       .then((md5Value: any) => {
         if (openChunk && chunkNumber > 1) {
           if (Upload.checkChunkOverNumber(chunkNumber, limitChunkNumber)) {
-            console.warn('upload stop, because the chunkNumber is over the limitChunkNumber');
+            console.warn(
+              `upload stop, because the chunkNumber ${chunkNumber} is over the limitChunkNumber ${limitChunkNumber}`
+            );
             return handleError(initValue || {}, true);
           }
           store.current = {

@@ -69,11 +69,18 @@ export class Upload {
 
   static checkFile(file: any) {
     if (!file) {
-      return warning('file is undefined when get start in the useUploadFile.');
+      warning('file is undefined when get start in the useUploadFile.');
+      return false;
     }
     if (!(file instanceof File)) {
-      return warning('file is not the instance of File.');
+      warning('file is not the instance of File.');
+      return false;
     }
+    if (!file.size) {
+      warning('file has no size when get start in the useUpLoadFile.');
+      return false;
+    }
+    return true;
   }
 
   static checkFn(uploadFn: any, options: any) {
