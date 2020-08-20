@@ -12,7 +12,7 @@ export class Upload {
     return new Promise((resolve, reject) => {
       if (useMd5) {
         fileReader.readAsBinaryString(file);
-        fileReader.onload = () => {
+        fileReader.onload = function() {
           const md5 = new Md5();
           // @ts-ignore
           md5.appendStr(this.result);

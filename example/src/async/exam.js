@@ -245,13 +245,14 @@ function FileCom(props) {
     resume,
     terminate
   } = useUploadFile((chunk, content, md5, file, total) => {
-    return uploadFetch({times: chunk, content, md5})
+    return uploadFetch({times: chunk, content, md5, total})
   }, {
     chunkSize: 500,
     limitChunkNumber: 60,
     limitFileSize: 500 * 1024,
     initValue: {success: ''},
-    timeout: 10000
+    timeout: 10000,
+    useMd5: true
   });
 
   useEffect(() => {
