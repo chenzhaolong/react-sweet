@@ -229,7 +229,7 @@ function CheckRely(props) {
 
 function uploadFetch (params) {
   return new Promise((res, rej) => {
-    console.log('params:', params);
+    // console.log('params:', params);
     setTimeout(() => {
       res({success: 'success'});
     }, 1000);
@@ -251,8 +251,12 @@ function FileCom(props) {
     limitChunkNumber: 60,
     limitFileSize: 500 * 1024,
     initValue: {success: ''},
-    timeout: 10000,
-    useMd5: true
+    timeout: 20000,
+    useMd5: true,
+    onTimeout(data, setData) {
+      console.log('timeout', data)
+      setData({success: 'timeout'})
+    }
   });
 
   useEffect(() => {
@@ -266,5 +270,8 @@ function FileCom(props) {
     }}/>
     <div>{loading ? response.status : response.data.success || '还没开始upload'}</div>
     <div>进度{response.percentage}</div>
+    <button onClick={() => {
+      terminate()
+    }}>终止</button>
   </div>
 }

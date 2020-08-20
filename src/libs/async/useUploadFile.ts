@@ -169,6 +169,11 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
         if (time === paramsList.length - 1) {
           handleSuccess(data);
         } else {
+          // 终止或者暂停
+          if (store.current.paramsList.length === 0 || store.current.isPause) {
+            return;
+          }
+          // 超时
           if (Upload.checkUploadTimeOut(startTime, Date.now(), timeout)) {
             handleTimeout(data);
             return;
