@@ -256,6 +256,10 @@ function FileCom(props) {
     onTimeout(data, setData) {
       console.log('timeout', data)
       setData({success: 'timeout'})
+    },
+    onTerminate(setData) {
+      console.log('terminate');
+      setData({success: 'terminate'});
     }
   });
 
