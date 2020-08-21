@@ -231,7 +231,11 @@ function uploadFetch (params) {
   return new Promise((res, rej) => {
     // console.log('params:', params);
     setTimeout(() => {
-      res({success: 'success'});
+      if (params.times > 10) {
+        rej({success: 'hahahha'});
+      } else {
+        res({success: 'success'});
+      }
     }, 1000);
   });
 }
@@ -263,10 +267,17 @@ function FileCom(props) {
     },
     onPause(setData) {
       setData({success: 'pause'});
-    }
+    },
     // onProgress(data) {
     //   console.log('progress', data)
     // }
+    onError(err, setData) {
+      console.log(err)
+      setData({success: 'error'})
+    },
+    onSuccess(data, setData) {
+      setData({success: 'complete'});
+    }
   });
 
   useEffect(() => {
