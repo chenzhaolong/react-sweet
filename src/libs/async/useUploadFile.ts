@@ -18,7 +18,7 @@ interface Options {
   onSuccess?: (response: any, setResponse: (data: any) => void) => void;
   onError?: (error: any, setResponse: (data: any) => void) => void;
   onTerminate?: (setResponse: (data: any) => void) => void;
-  onPause?: () => void;
+  onPause?: (setResponse: (data: any) => void) => void;
   onProgress?: (data: any) => void;
   deps?: Array<any>;
   useMd5?: boolean;
@@ -159,6 +159,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
   const upload = useCallback(() => {
     const { paramsList, time, isPause, file, startTime } = store.current;
     if (paramsList.length === 0 || isPause) {
+      setLoading(false);
       return;
     }
     const params = paramsList[time];
@@ -171,6 +172,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
         } else {
           // 终止或者暂停
           if (store.current.paramsList.length === 0 || store.current.isPause) {
+            setLoading(false);
             return;
           }
           // 超时
@@ -196,7 +198,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       .catch((e: any) => {
         handleError(e);
       });
-  }, []);
+  }, realDeps);
 
   const start = useCallback((file: any) => {
     if (!Upload.checkFile(file)) {
@@ -261,22 +263,30 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
     } else {
       setData(initValue || {});
     }
-  }, realDeps);
+  }, [response.percentage]);
 
   const pause = useCallback(() => {
+    const setData = (data: any) => {
+      setResponse({
+        status: Status.PAUSE,
+        data: data,
+        percentage: response.percentage
+      });
+    };
     store.current.isPause = true;
     setLoading(false);
-    setResponse({ ...response, status: Status.PAUSE });
     if (isFunction(onPause)) {
-      onPause();
+      onPause(setData);
+    } else {
+      setData(response.data);
     }
-  }, realDeps);
+  }, [response.percentage]);
 
   const resume = useCallback(() => {
     setLoading(true);
     store.current.isPause = false;
     upload();
-  }, realDeps);
+  }, [response.percentage]);
 
   return { response, loading, start, pause, resume, terminate };
 }

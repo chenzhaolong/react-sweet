@@ -248,10 +248,10 @@ function FileCom(props) {
     return uploadFetch({times: chunk, content, md5, total})
   }, {
     chunkSize: 500,
-    limitChunkNumber: 60,
-    limitFileSize: 500 * 1024,
+    limitChunkNumber: 5000,
+    limitFileSize: 5000 * 1024,
     initValue: {success: ''},
-    timeout: 20000,
+    // timeout: 20000,
     useMd5: true,
     onTimeout(data, setData) {
       console.log('timeout', data)
@@ -260,11 +260,18 @@ function FileCom(props) {
     onTerminate(setData) {
       console.log('terminate');
       setData({success: 'terminate'});
+    },
+    onPause(setData) {
+      setData({success: 'pause'});
     }
+    // onProgress(data) {
+    //   console.log('progress', data)
+    // }
   });
 
   useEffect(() => {
-    console.log('response', response)
+    console.log('response', response);
+    console.log('loading', loading);
   });
 
   return <div>
@@ -277,5 +284,11 @@ function FileCom(props) {
     <button onClick={() => {
       terminate()
     }}>终止</button>
+    <button onClick={() => {
+      pause()
+    }}>暂停</button>
+    <button onClick={() => {
+      resume()
+    }}>恢复</button>
   </div>
 }
