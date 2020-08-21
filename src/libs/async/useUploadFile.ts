@@ -71,7 +71,7 @@ function checkPromise(promise: any): void {
   }
 }
 
-const defaultValue = { paramsList: [], time: 0, isPause: false, file: {}, startTime: 0 };
+const defaultValue = () => ({ paramsList: [], time: 0, isPause: false, file: {}, startTime: 0 });
 
 function useUploadFile(uploadFn: UploadFn, options: Options): Result {
   Upload.checkFn(uploadFn, options);
@@ -97,7 +97,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
   const [response, setResponse] = useState({ status: Status.UNSTART, data: initValue || {}, percentage: 0 });
   const [loading, setLoading] = useState(false);
   const realDeps = deps || [];
-  const store: { current: Store } = useRef(defaultValue);
+  const store: { current: Store } = useRef(defaultValue());
 
   const handleSuccess = useCallback((data: any) => {
     const setData = (result: any) => {
@@ -108,7 +108,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       });
     };
     setLoading(false);
-    store.current = defaultValue;
+    store.current = defaultValue();
     if (isFunction(onSuccess)) {
       onSuccess(data, setData);
     } else {
@@ -125,7 +125,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       });
     };
     setLoading(false);
-    store.current = defaultValue;
+    store.current = defaultValue();
     if (isWarn) {
       return setData(error);
     }
@@ -148,7 +148,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       'the upload is timeout, cause timeout maybe you invoke pause to stop stop and after a few second invoke resume for going on.'
     );
     setLoading(false);
-    store.current = defaultValue;
+    store.current = defaultValue();
     if (isFunction(onTimeout)) {
       onTimeout(data, setData);
     } else {
@@ -224,7 +224,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
             return handleError(initValue || {}, true);
           }
           store.current = {
-            ...store.current,
+            isPause: false,
             paramsList: Upload.getUploadParams(file, chunkNumber, chunkSize, md5Value),
             time: 0,
             file: file,
@@ -257,7 +257,7 @@ function useUploadFile(uploadFn: UploadFn, options: Options): Result {
       });
     };
     setLoading(false);
-    store.current = defaultValue;
+    store.current = defaultValue();
     if (isFunction(onTerminate)) {
       onTerminate(setData);
     } else {
