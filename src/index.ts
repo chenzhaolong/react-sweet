@@ -41,7 +41,8 @@ export { default as useRule } from './libs/formVerify/useRule';
 // export { default as useInputChange } from './libs/formVerify/useInputChange';
 
 /* store */
-export { default as useStore } from './libs/store/useStore';
+export { default as createHookStore } from './libs/store/createHookStore';
+export { default as createHookProvider } from './libs/store/createHookProvider';
 
 /* commonBiz */
 export { default as useLazyLoad } from './libs/commonBiz/useLazyLoad';

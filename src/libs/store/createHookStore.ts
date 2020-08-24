@@ -2,8 +2,8 @@
  * @file store of state
  */
 
-function useStore() {
+function createHookStore() {
   console.log('useStore');
 }
 
-export default useStore;
+export default createHookStore;
