@@ -2,8 +2,9 @@
  * @file store of Component
  */
 
-function createHookProvider() {
-  console.log('useStore');
+function createHookProvider(key: string, initState?: object) {
+  console.log(key);
+  console.log(initState);
 }
 
 export default createHookProvider;
