@@ -5,6 +5,7 @@ import { useReducer, useMemo } from 'react';
 import { isFunction, isObject, get, isString } from 'lodash';
 import { error } from '../../utils/log';
 import { StoreUtils } from '../../utils/store';
+import { logPlugins } from '../../plugins/logPlugins';
 
 interface Options {
   openAsync?: boolean;
@@ -30,22 +31,34 @@ function useStore(reducer: Reducer | Obj, options: Options): Result {
     error('the reducer must be pure function or object in useStore');
   }
   const { openAsync = false, plugins = [], initState = {} } = options;
+
   const combineReducer = useMemo(() => {
     return isObject(reducer) ? StoreUtils.combineReducer(reducer) : reducer;
   }, [reducer]);
 
-  const [state, dispatch] = useReducer(combineReducer, initState);
+  const [state, rootDispatch] = useReducer(combineReducer, initState);
+
+  const middleWares = useMemo(() => {
+    const middleWares = StoreUtils.applyMiddleWares(plugins);
+    middleWares.push(logPlugins);
+    return middleWares.map((fn: Function) => fn(state));
+  }, plugins);
+
+  const wrapperDispatch = useMemo(() => {
+    return StoreUtils.compose(middleWares)(rootDispatch);
+  }, plugins);
+
   return {
     dispatch(action: Action) {
       const { payload, type } = action;
       // @ts-ignore
       if (openAsync && isFunction(payload)) {
         const realDispatch = (data: any) => {
-          dispatch({ type, payload: data });
+          wrapperDispatch({ type, payload: data });
         };
-        payload(state, realDispatch);
+        return payload(state, realDispatch);
       } else {
-        dispatch(action);
+        wrapperDispatch(action);
       }
     },
     getState(path?: string) {
