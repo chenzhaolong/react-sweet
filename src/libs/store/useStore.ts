@@ -50,9 +50,9 @@ function useStore(reducer: Reducer | Obj, options: Options): Result {
 
   return {
     dispatch(action: Action) {
-      const { payload, type } = action;
       // @ts-ignore
-      if (openAsync && isFunction(payload)) {
+      if (openAsync && isObject(action) && isFunction(action.payload)) {
+        const { payload, type } = action;
         const realDispatch = (data: any) => {
           wrapperDispatch({ type, payload: data });
         };
