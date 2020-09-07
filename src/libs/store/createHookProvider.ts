@@ -20,7 +20,7 @@ interface Output {
 function createHookProvider(options: Input): Output {
   const { key, initState, force = false } = options;
   if (!isString(key)) {
-    error('the first params must exist when invoke createHookProvider.');
+    error('the params must exist key when invoke createHookProvider.');
   }
   const initState1 = initState || {};
   const StoreContext: any = React.createContext(initState1);
