@@ -8,7 +8,6 @@ import { ProviderRepo } from '../../utils/ProviderRepo';
 
 interface Input {
   key: string;
-  initState: object;
   force?: boolean;
 }
 
@@ -18,12 +17,12 @@ interface Output {
 }
 
 function createHookProvider(options: Input): Output {
-  const { key, initState, force = false } = options;
+  const { key, force = false } = options;
   if (!isString(key)) {
     error('the params must exist key when invoke createHookProvider.');
   }
-  const initState1 = initState || {};
-  const StoreContext: any = React.createContext(initState1);
+  // @ts-ignore
+  const StoreContext: any = React.createContext();
   ProviderRepo.saveToRepo(key, StoreContext, force);
   return { Provider: StoreContext.Provider, Consumer: StoreContext.Consumer };
 }
