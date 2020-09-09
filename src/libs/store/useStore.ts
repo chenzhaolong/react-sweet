@@ -36,7 +36,16 @@ function useStore(reducer: Reducer | Obj, options: Options): Result {
     return isObject(reducer) ? StoreUtils.combineReducer(reducer) : reducer;
   }, [reducer]);
 
-  const [state, rootDispatch] = useReducer(combineReducer, initState);
+  const realInitState = useMemo(() => {
+    if (isObject(reducer)) {
+      Object.keys(reducer).forEach((key: string) => {
+        initState[key] = initState[key] ? initState[key] : {};
+      });
+    }
+    return initState;
+  }, []);
+
+  const [state, rootDispatch] = useReducer(combineReducer, realInitState);
 
   const middleWares = useMemo(() => {
     const middleWares = StoreUtils.applyMiddleWares(plugins);
