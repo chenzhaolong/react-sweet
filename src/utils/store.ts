@@ -10,7 +10,7 @@ export class StoreUtils {
     const keys = Object.keys(reducer);
 
     return (state: any, action: any) => {
-      const combineState = {};
+      const combineState = state;
       keys.forEach((key: string) => {
         const partState = state[key];
         const partReducer = reducer[key];
