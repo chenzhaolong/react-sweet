@@ -3,7 +3,7 @@
  */
 import { ProviderRepo } from '../../utils/ProviderRepo';
 import { isString, isFunction } from 'lodash';
-import { error, warning } from '../../utils/log';
+import { error } from '../../utils/log';
 import { useContext, useMemo } from 'react';
 
 interface Options {
@@ -39,17 +39,17 @@ function useConnect(options: Options): Result {
 
   if (!Context) {
     // @ts-ignore
-    return warning(`the key of ${relateKey} has nothing, please make sure the key has Context Component.`);
+    error(`the key of ${relateKey} has nothing, please make sure the key has Context Component.`);
   }
 
   const store: Store = useContext(Context);
 
   const partState = useMemo(() => {
+    const globalState = store.getState();
     if (isFunction(mapState)) {
-      const globalState = store.getState();
       return mapState(globalState);
     }
-    return {};
+    return globalState;
   }, deps);
 
   const partDispatch = useMemo(() => {
@@ -59,11 +59,10 @@ function useConnect(options: Options): Result {
       const globalState = getState();
       dispatchFn = mapDispatch(globalState, dispatch);
     }
-    dispatchFn = {};
-    return (key: string, action: Action) => {
+    return (key: string, ...rest: Array<any>) => {
       const fn = dispatchFn[key];
       if (isFunction(fn)) {
-        return fn(action);
+        return fn(...rest);
       }
     };
   }, deps);
