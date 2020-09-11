@@ -9,6 +9,7 @@ import {Tools} from './tools/exam';
 import {Native} from './native/exam';
 import {Async} from './async/exam';
 import {Form} from './form/input';
+import {StoreComponent} from './store/store';
 
 class App extends Component {
   render() {
@@ -17,8 +18,9 @@ class App extends Component {
         {/* <Life /> */}
         {/*<Tools />*/}
         {/*<Native />*/}
-        <Async />
+        {/*<Async />*/}
         {/* <Form />*/}
+        <StoreComponent />
       </div>
     )
   }

@@ -19,7 +19,7 @@ interface Output {
 function createHookProvider(options: Input): Output {
   const { key, force = false } = options;
   if (!isString(key)) {
-    error('the params must exist key when invoke createHookProvider.');
+    error('the key must exist when invoke createHookProvider.');
   }
   // @ts-ignore
   const StoreContext: any = React.createContext();

@@ -26,16 +26,18 @@ interface Result {
   // subscribe: (fn: Function) => void;
 }
 
-function useStore(reducer: Reducer | Obj, options: Options): Result {
-  if (!isFunction(reducer) || !isObject(reducer)) {
+function useStore(reducer: Reducer | Obj, options: Options = {}): Result {
+  if (!isFunction(reducer) && !isObject(reducer)) {
     error('the reducer must be pure function or object in useStore');
   }
   const { openAsync = false, plugins = [], initState = {} } = options;
 
+  // 合并reducer
   const combineReducer = useMemo(() => {
     return isObject(reducer) ? StoreUtils.combineReducer(reducer) : reducer;
   }, [reducer]);
 
+  // 初始值
   const realInitState = useMemo(() => {
     if (isObject(reducer)) {
       Object.keys(reducer).forEach((key: string) => {
@@ -47,15 +49,18 @@ function useStore(reducer: Reducer | Obj, options: Options): Result {
 
   const [state, rootDispatch] = useReducer(combineReducer, realInitState);
 
-  const middleWares = useMemo(() => {
+  // 中间件
+  const middleWaresFn: Array<Function> = useMemo(() => {
     const middleWares = StoreUtils.applyMiddleWares(plugins);
     middleWares.push(logPlugins);
-    return middleWares.map((fn: Function) => fn(state));
+    return middleWares;
   }, plugins);
 
-  const wrapperDispatch = useMemo(() => {
-    return StoreUtils.compose(middleWares)(rootDispatch);
-  }, plugins);
+  // todo:优化
+  const middleWares = middleWaresFn.map((fn: Function) => fn(state));
+
+  // 包装dispatch
+  const wrapperDispatch = StoreUtils.compose(middleWares)(rootDispatch);
 
   return {
     dispatch(action: Action) {

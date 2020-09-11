@@ -50,7 +50,7 @@ function useConnect(options: Options): Result {
       return mapState(globalState);
     }
     return globalState;
-  }, deps);
+  }, [store, ...deps]);
 
   const partDispatch = useMemo(() => {
     let dispatchFn = {};
@@ -65,7 +65,7 @@ function useConnect(options: Options): Result {
         return fn(...rest);
       }
     };
-  }, deps);
+  }, [store, ...deps]);
 
   return {
     state: partState,

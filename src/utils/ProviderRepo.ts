@@ -17,14 +17,14 @@ export class ProviderRepo {
 
   static getFromRepo(key: string) {
     if (Object.keys(ProviderRepo.repos).indexOf(key) !== -1) {
-      return ProviderRepo[key];
+      return ProviderRepo.repos[key];
     }
     return '';
   }
 
   static deleteFromRepo(key: string) {
     if (Object.keys(ProviderRepo.repos).indexOf(key) !== -1) {
-      delete ProviderRepo[key];
+      delete ProviderRepo.repos[key];
     }
   }
 }

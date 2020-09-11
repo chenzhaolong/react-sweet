@@ -21,7 +21,7 @@ export class StoreUtils {
           }
         }
       });
-      return combineState;
+      return { ...combineState };
     };
   }
 
