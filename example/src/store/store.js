@@ -25,7 +25,7 @@ function Root() {
     App: AppleReducer,
     Ban: BananaReducer,
     Gray: GrayReducer
-  });
+  }, {openCache: true});
   // const [state, dispatch] = useReducer(AppleReducer, {});
   useEffect(() => {
     console.log(store.getState());
@@ -60,6 +60,7 @@ function mapDispatchForA1(state, dispatch) {
   }
 }
 
+// 子组件
 function A1(props) {
   const {state, dispatch} = useConnect({
     relateKey: Key.p1,
@@ -70,8 +71,10 @@ function A1(props) {
     console.log('A1', state);
   });
   return <div>
-    <span>sta1: {state.sta1}</span>
-    <span>sta2: {state.sta2}</span>
+    <p>子：</p>
+    <div>sta1: {state.sta1}</div>
+    <div>sta2: {state.sta2}</div>
+    <br/>
     <button onClick={() => {
       dispatch('disA1', {a: 1})
     }}>改变sta1</button>
@@ -81,10 +84,48 @@ function A1(props) {
     <button onClick={() => {
       dispatch('disA1', {a: 3})
     }}>改变sta2</button>
+    <A2/>
   </div>
 }
 
-function B1(props) {
+function mapStateForA2(stateFn) {
+  return {
+    A2D1: stateFn('Ban.banana1', 'haha'),
+    A2D2: stateFn('Gray.gray2.white', 'yes'),
+    A2D3: stateFn('App.apple3', 'unstart1')
+  }
+}
 
+function mapDispatchForA2(state, dispatch) {
+  return {
+    disA1(data) {
+      dispatch({type: 'add1', payload: data})
+    },
+    disA2(data) {
+      dispatch({type: 'dul2', payload: data})
+    }
+  }
+}
+
+// 孙组件
+function A2(props) {
+  const {state, dispatch} = useConnect({
+    relateKey: Key.p1,
+    mapState: mapStateForA2,
+    mapDispatch: mapDispatchForA2
+  });
+  return <div>
+    <p>孙：</p>
+    <div>A2D1:{state.A2D1}</div>
+    <div>A2D2:{state.A2D2}</div>
+    <div>A2D3:{state.A2D3}</div>
+    <br/>
+    <button onClick={() => {
+      dispatch('disA1', 'banana')
+    }}>改变A2D1</button>
+    <button onClick={() => {
+      dispatch('disA2', 'woo')
+    }}>改变A2D2</button>
+  </div>
 }
 

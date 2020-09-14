@@ -6,11 +6,13 @@ import { isFunction, isObject, get, isString } from 'lodash';
 import { error } from '../../utils/log';
 import { StoreUtils } from '../../utils/store';
 import { logPlugins } from '../../plugins/logPlugins';
+import { cachePlugins } from '../../plugins/cachePlugins';
 
 interface Options {
   openAsync?: boolean;
   plugins?: Array<Function>;
   initState?: object;
+  openCache?: boolean;
   // deps?: Array<any>;
 }
 
@@ -30,7 +32,7 @@ function useStore(reducer: Reducer | Obj, options: Options = {}): Result {
   if (!isFunction(reducer) && !isObject(reducer)) {
     error('the reducer must be pure function or object in useStore');
   }
-  const { openAsync = false, plugins = [], initState = {} } = options;
+  const { openAsync = false, plugins = [], initState = {}, openCache = false } = options;
 
   // 合并reducer
   const combineReducer = useMemo(() => {
@@ -62,6 +64,9 @@ function useStore(reducer: Reducer | Obj, options: Options = {}): Result {
   const wrapperDispatch = useCallback(
     (state) => {
       const middleWaresFn = StoreUtils.applyMiddleWares(plugins);
+      if (openCache) {
+        middleWaresFn.push(cachePlugins);
+      }
       middleWaresFn.push(logPlugins);
       const middleWares = middleWaresFn.map((fn: Function) => fn(state));
       return StoreUtils.compose(middleWares)(rootDispatch);
