@@ -45,11 +45,10 @@ function useConnect(options: Options): Result {
   const store: Store = useContext(Context);
 
   const partState = useMemo(() => {
-    const globalState = store.getState();
     if (isFunction(mapState)) {
-      return mapState(globalState);
+      return mapState(store.getState);
     }
-    return globalState;
+    return store.getState();
   }, [store, ...deps]);
 
   const partDispatch = useMemo(() => {

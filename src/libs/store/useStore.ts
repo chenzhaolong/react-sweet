@@ -22,7 +22,7 @@ type Action = { type: string; payload: any };
 
 interface Result {
   dispatch: (action: Action) => any;
-  getState: (path?: string) => any;
+  getState: (path?: string, defaultValue?: any) => any;
   // subscribe: (fn: Function) => void;
 }
 
@@ -82,9 +82,9 @@ function useStore(reducer: Reducer | Obj, options: Options = {}): Result {
         wrapperDispatch(action);
       }
     },
-    getState(path?: string) {
+    getState(path?: string, defaultValue?: any) {
       if (isString(path)) {
-        return get(state, path, {});
+        return get(state, path, defaultValue || {});
       } else {
         return state;
       }

@@ -42,10 +42,10 @@ function Root() {
   </Provider>
 }
 
-function mapStateForA1(state) {
+function mapStateForA1(stateFn) {
   return {
-    sta1: state.App.apple1,
-    sta2: state.App.apple3
+    sta1: stateFn('App.apple1.a', 'unstart'),
+    sta2: stateFn('App.apple3', 'unstart1')
   }
 }
 
@@ -73,11 +73,18 @@ function A1(props) {
     <span>sta1: {state.sta1}</span>
     <span>sta2: {state.sta2}</span>
     <button onClick={() => {
-      dispatch('disA1', 'yes')
+      dispatch('disA1', {a: 1})
     }}>改变sta1</button>
     <button onClick={() => {
       dispatch('disA2', 'woo')
     }}>改变sta2</button>
+    <button onClick={() => {
+      dispatch('disA1', {a: 3})
+    }}>改变sta2</button>
   </div>
+}
+
+function B1(props) {
+
 }
 
