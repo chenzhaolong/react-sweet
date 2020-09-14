@@ -1,7 +1,7 @@
 /**
  * @file store of state
  */
-import { useReducer, useMemo } from 'react';
+import { useReducer, useMemo, useCallback } from 'react';
 import { isFunction, isObject, get, isString } from 'lodash';
 import { error } from '../../utils/log';
 import { StoreUtils } from '../../utils/store';
@@ -50,17 +50,24 @@ function useStore(reducer: Reducer | Obj, options: Options = {}): Result {
   const [state, rootDispatch] = useReducer(combineReducer, realInitState);
 
   // 中间件
-  const middleWaresFn: Array<Function> = useMemo(() => {
-    const middleWares = StoreUtils.applyMiddleWares(plugins);
-    middleWares.push(logPlugins);
-    return middleWares;
-  }, plugins);
-
-  // todo:优化
-  const middleWares = middleWaresFn.map((fn: Function) => fn(state));
+  // const middleWaresFn: Array<Function> = useMemo(() => {
+  //   const middleWares = StoreUtils.applyMiddleWares(plugins);
+  //   middleWares.push(logPlugins);
+  //   return middleWares;
+  // }, plugins);
+  // const middleWares = middleWaresFn.map((fn: Function) => fn(state));
+  // const wrapperDispatch = StoreUtils.compose(middleWares)(rootDispatch);
 
   // 包装dispatch
-  const wrapperDispatch = StoreUtils.compose(middleWares)(rootDispatch);
+  const wrapperDispatch = useCallback(
+    (state) => {
+      const middleWaresFn = StoreUtils.applyMiddleWares(plugins);
+      middleWaresFn.push(logPlugins);
+      const middleWares = middleWaresFn.map((fn: Function) => fn(state));
+      return StoreUtils.compose(middleWares)(rootDispatch);
+    },
+    [plugins]
+  )(state);
 
   return {
     dispatch(action: Action) {
