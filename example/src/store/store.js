@@ -5,6 +5,8 @@
 import React, {Component, useEffect, useReducer} from 'react';
 import {useStore, useConnect, createHookProvider} from '../../react-sweet';
 import {AppleReducer, BananaReducer, GrayReducer} from './reducer';
+import {demoPlugins} from './demoPlugins';
+import {fetch1} from './fetch';
 
 const Key = {
   p1: 'provider'
@@ -25,11 +27,13 @@ function Root() {
     App: AppleReducer,
     Ban: BananaReducer,
     Gray: GrayReducer
-  }, {openCache: true});
-  // const [state, dispatch] = useReducer(AppleReducer, {});
+  }, {
+    openCache: true,
+    plugins: [demoPlugins]
+  });
+
   useEffect(() => {
     console.log(store.getState());
-    // console.log('state', state);
   });
   return <Provider value={store}>
     <div>
@@ -102,7 +106,19 @@ function mapDispatchForA2(state, dispatch) {
       dispatch({type: 'add1', payload: data})
     },
     disA2(data) {
-      dispatch({type: 'dul2', payload: data})
+      dispatch({type: 'dul2', payload: {white: data}})
+    },
+    disA3() {
+      const action = (state, next) => {
+        fetch1()
+          .then(d => {
+            next({type: 'dul2', payload: {white: d}})
+          })
+          .catch(e => {
+            console.log('err', e)
+          })
+      };
+      dispatch(action)
     }
   }
 }
@@ -126,6 +142,9 @@ function A2(props) {
     <button onClick={() => {
       dispatch('disA2', 'woo')
     }}>改变A2D2</button>
+    <button onClick={() => {
+      dispatch('disA3')
+    }}>action为函数</button>
   </div>
 }
 

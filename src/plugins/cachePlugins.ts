@@ -37,7 +37,7 @@ export function cachePlugins(globalState: object) {
         const { type, payload } = action;
         const hasCache = Cache.hasCache(type, payload);
         if (hasCache) {
-          console.log(`%c${action.type}-has no change:`, 'color: blue', globalState);
+          console.log(`%ctype-${action.type} has no change:`, 'color: blue', globalState);
         } else {
           next(action);
         }
