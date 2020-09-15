@@ -7,6 +7,7 @@ import {useStore, useConnect, createHookProvider} from '../../react-sweet';
 import {AppleReducer, BananaReducer, GrayReducer} from './reducer';
 import {demoPlugins} from './demoPlugins';
 import {fetch1} from './fetch';
+import {A2} from './components/child1';
 
 const Key = {
   p1: 'provider'
@@ -29,7 +30,8 @@ function Root() {
     Gray: GrayReducer
   }, {
     openCache: true,
-    plugins: [demoPlugins]
+    plugins: [demoPlugins],
+    openAsync: true
   });
 
   useEffect(() => {
@@ -88,63 +90,6 @@ function A1(props) {
     <button onClick={() => {
       dispatch('disA1', {a: 3})
     }}>改变sta2</button>
-    <A2/>
+    <A2 key1={Key.p1}/>
   </div>
 }
-
-function mapStateForA2(stateFn) {
-  return {
-    A2D1: stateFn('Ban.banana1', 'haha'),
-    A2D2: stateFn('Gray.gray2.white', 'yes'),
-    A2D3: stateFn('App.apple3', 'unstart1')
-  }
-}
-
-function mapDispatchForA2(state, dispatch) {
-  return {
-    disA1(data) {
-      dispatch({type: 'add1', payload: data})
-    },
-    disA2(data) {
-      dispatch({type: 'dul2', payload: {white: data}})
-    },
-    disA3() {
-      const action = (state, next) => {
-        fetch1()
-          .then(d => {
-            next({type: 'dul2', payload: {white: d}})
-          })
-          .catch(e => {
-            console.log('err', e)
-          })
-      };
-      dispatch(action)
-    }
-  }
-}
-
-// 孙组件
-function A2(props) {
-  const {state, dispatch} = useConnect({
-    relateKey: Key.p1,
-    mapState: mapStateForA2,
-    mapDispatch: mapDispatchForA2
-  });
-  return <div>
-    <p>孙：</p>
-    <div>A2D1:{state.A2D1}</div>
-    <div>A2D2:{state.A2D2}</div>
-    <div>A2D3:{state.A2D3}</div>
-    <br/>
-    <button onClick={() => {
-      dispatch('disA1', 'banana')
-    }}>改变A2D1</button>
-    <button onClick={() => {
-      dispatch('disA2', 'woo')
-    }}>改变A2D2</button>
-    <button onClick={() => {
-      dispatch('disA3')
-    }}>action为函数</button>
-  </div>
-}
-

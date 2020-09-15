@@ -37,7 +37,10 @@ export function cachePlugins(globalState: object) {
         const { type, payload } = action;
         const hasCache = Cache.hasCache(type, payload);
         if (hasCache) {
-          console.log(`%ctype-${action.type} has no change:`, 'color: blue', globalState);
+          console.groupCollapsed(`%ctype-${action.type} has no change:`, 'color: blue');
+          console.log(`%c action:`, 'color: blue', action);
+          console.log(`%c prevState:`, 'color: blue', globalState);
+          console.groupEnd();
         } else {
           next(action);
         }
