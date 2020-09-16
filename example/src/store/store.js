@@ -8,12 +8,16 @@ import {AppleReducer, BananaReducer, GrayReducer} from './reducer';
 import {demoPlugins} from './demoPlugins';
 import {fetch1} from './fetch';
 import {A2} from './components/child1';
+import {Child3} from './components/child3';
 
 const Key = {
-  p1: 'provider'
+  p1: 'provider',
+  p2: 'provider1'
 };
 
 const Provider = createHookProvider({key: Key.p1}).Provider;
+
+const Provider1 = createHookProvider({key: Key.p2}).Provider;
 
 export class StoreComponent extends Component {
   render() {
@@ -40,10 +44,7 @@ function Root() {
   return <Provider value={store}>
     <div>
       <A1/>
-      {/*<span>{state.apple1}</span>*/}
-      {/*<button onClick={() => {*/}
-      {/*  dispatch({type:'add', payload: 'uyu'})*/}
-      {/*}}>改变appple1</button>*/}
+      <Root1/>
     </div>
   </Provider>
 }
@@ -92,4 +93,18 @@ function A1(props) {
     }}>改变sta2</button>
     <A2 key1={Key.p1}/>
   </div>
+}
+
+
+// 兄弟节点
+function Root1(props) {
+  const store = useStore({
+    Mon: BananaReducer,
+    Tue: GrayReducer
+  }, {
+    openCache: true
+  });
+  return <Provider1 value={store}>
+    <Child3 key1={Key.p1} key2={Key.p2} />
+  </Provider1>
 }

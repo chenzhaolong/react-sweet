@@ -51,15 +51,6 @@ function useStore(reducer: Reducer | Obj, options: Options = {}): Result {
 
   const [state, rootDispatch] = useReducer(combineReducer, realInitState);
 
-  // 中间件
-  // const middleWaresFn: Array<Function> = useMemo(() => {
-  //   const middleWares = StoreUtils.applyMiddleWares(plugins);
-  //   middleWares.push(logPlugins);
-  //   return middleWares;
-  // }, plugins);
-  // const middleWares = middleWaresFn.map((fn: Function) => fn(state));
-  // const wrapperDispatch = StoreUtils.compose(middleWares)(rootDispatch);
-
   // 包装dispatch
   const wrapperDispatch = useCallback(
     (state) => {

@@ -43,9 +43,9 @@ export function A3(props) {
   });
   return <div>
     <p>曾孙：</p>
-    <div>A2D1:{state.A3D1}</div>
-    <div>A2D2:{state.A3D2}</div>
-    <div>A2D3:{state.A3D3}</div>
+    <div>A3D1:{state.A3D1}</div>
+    <div>A3D2:{state.A3D2}</div>
+    <div>A3D3:{state.A3D3}</div>
     <br/>
     <button onClick={() => {
       dispatch('disA1', 'banana')
