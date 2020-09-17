@@ -85,6 +85,34 @@ export function Child3(props) {
     <button onClick={() => {
       store2.dispatch('disA3', 130)
     }}>改变B2D1</button>
+    <Child4 key2={props.key2}/>
   </div>
 }
 
+function Child4 (props) {
+  const {state, dispatch} = useConnect({
+    relateKey: props.key2,
+    mapState: (stateFn) => {
+      return {
+        B2B1: stateFn('Tue.gray3', 'unstart')
+      }
+    },
+    mapDispatch: (state, dispatch) => {
+      return {
+        dis1: (action) => {
+          console.log(state.Tue.gray3);
+          dispatch(action)
+        }
+      }
+    }
+  });
+  return <div>
+    {/*<p>banana1: {state.Mon.banana1}</p>*/}
+    <p>gray2: {state.B2B1}</p>
+    <button onClick={() => {
+      dispatch('dis12', {type: 'mul2', payload: 12})
+    }}>
+      改变gray2
+    </button>
+  </div>
+}

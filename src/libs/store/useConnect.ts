@@ -3,7 +3,7 @@
  */
 import { ProviderRepo } from '../../utils/ProviderRepo';
 import { isString, isFunction } from 'lodash';
-import { error } from '../../utils/log';
+import { error, warning } from '../../utils/log';
 import { useContext, useMemo } from 'react';
 
 interface Options {
@@ -62,6 +62,8 @@ function useConnect(options: Options): Result {
       const fn = dispatchFn[key];
       if (isFunction(fn)) {
         return fn(...rest);
+      } else {
+        warning(`the dispatch function "${key}" has not existed in the mpaDispatch in useConnect. please check it.`);
       }
     };
   }, [store, ...deps]);

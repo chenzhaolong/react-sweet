@@ -46,5 +46,5 @@ export { default as createHookProvider } from './libs/store/createHookProvider';
 export { default as useConnect } from './libs/store/useConnect';
 
 /* commonBiz */
-export { default as useLazyLoad } from './libs/commonBiz/useLazyLoad';
-export { default as useImageLoad } from './libs/commonBiz/useImageLoad';
+// export { default as useLazyLoad } from './libs/commonBiz/useLazyLoad';
+// export { default as useImageLoad } from './libs/commonBiz/useImageLoad';
