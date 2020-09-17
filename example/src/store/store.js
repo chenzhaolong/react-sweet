@@ -20,14 +20,23 @@ const Provider = createHookProvider({key: Key.p1}).Provider;
 const Provider1 = createHookProvider({key: Key.p2}).Provider;
 
 export class StoreComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: 1
+    }
+  }
   render() {
     return <div>
-      <Root/>
+      <Root id={this.state.id}/>
+      <button onClick={() => {
+        this.setState({id: this.state.id + 1})
+      }}>改变id</button>
     </div>
   }
 }
 
-function Root() {
+function Root(props) {
   const store = useStore({
     App: AppleReducer,
     Ban: BananaReducer,
@@ -39,12 +48,12 @@ function Root() {
   });
 
   useEffect(() => {
-    console.log(store.getState());
-  });
+    console.log('global', store.getState());
+  }, [store]);
   return <Provider value={store}>
     <div>
       <A1/>
-      <Root1/>
+      <Root1 id={props.id}/>
     </div>
   </Provider>
 }
@@ -76,7 +85,7 @@ function A1(props) {
   });
   useEffect(() => {
     console.log('A1', state);
-  });
+  }, [state.sta1]);
   return <div>
     <p>子：</p>
     <div>sta1: {state.sta1}</div>
@@ -105,6 +114,6 @@ function Root1(props) {
     openCache: true
   });
   return <Provider1 value={store}>
-    <Child3 key1={Key.p1} key2={Key.p2} />
+    <Child3 key1={Key.p1} key2={Key.p2} id={props.id}/>
   </Provider1>
 }

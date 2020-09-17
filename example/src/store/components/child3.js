@@ -55,7 +55,8 @@ export function Child3(props) {
   const store1 = useConnect({
     relateKey: props.key1,
     mapState: mapStateForA3,
-    mapDispatch: mapDispatchForA3
+    mapDispatch: mapDispatchForA3,
+    deps: [props.id]
   });
 
   const store2 = useConnect({
@@ -90,7 +91,7 @@ export function Child3(props) {
 }
 
 function Child4 (props) {
-  const {state, dispatch} = useConnect({
+  const {state, dispatch, Consumer} = useConnect({
     relateKey: props.key2,
     mapState: (stateFn) => {
       return {
@@ -114,5 +115,12 @@ function Child4 (props) {
     }}>
       改变gray2
     </button>
+    <Consumer>
+      {
+        store => {
+          return <div>{store.getState('Tue.gray3', 'sdfa')}</div>
+        }
+      }
+    </Consumer>
   </div>
 }
