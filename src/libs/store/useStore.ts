@@ -13,6 +13,7 @@ interface Options {
   plugins?: Array<Function>;
   initState?: object;
   openCache?: boolean;
+  openLog?: boolean;
   // deps?: Array<any>;
 }
 
@@ -32,7 +33,7 @@ function useStore(reducer: Reducer | Obj, options: Options = {}): Result {
   if (!isFunction(reducer) && !isObject(reducer)) {
     error('the reducer must be pure function or object in useStore');
   }
-  const { openAsync = false, plugins = [], initState = {}, openCache = false } = options;
+  const { openAsync = false, plugins = [], initState = {}, openCache = false, openLog = true } = options;
 
   // 合并reducer
   const combineReducer = useMemo(() => {
@@ -58,7 +59,9 @@ function useStore(reducer: Reducer | Obj, options: Options = {}): Result {
       if (openCache) {
         middleWaresFn.push(cachePlugins);
       }
-      middleWaresFn.push(logPlugins);
+      if (openLog) {
+        middleWaresFn.push(logPlugins);
+      }
       const middleWares = middleWaresFn.map((fn: Function) => fn(state));
       return StoreUtils.compose(middleWares)(rootDispatch);
     },
