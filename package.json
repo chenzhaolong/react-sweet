@@ -5,14 +5,14 @@
   "main": "./src/index.js",
   "directories": {
     "doc": "docs",
-    "example": "example",
-    "test": "test"
+    "example": "example"
   },
   "scripts": {
     "build": "tsc",
     "publish": "sh ./bin/publish.sh",
     "debug": "gulp compiler",
-    "eslint": "eslint --ext .tsx,.ts --fix ./src"
+    "eslint": "eslint --ext .tsx,.ts --fix ./src",
+    "test": "jest"
   },
   "husky": {
     "hooks": {
@@ -40,27 +40,33 @@
   },
   "homepage": "https://github.com/chenzhaolong/react-sweet#readme",
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-jest": "^26.3.0",
+    "babel-preset-env": "^1.7.0",
     "eslint-plugin-react-hooks": "^4.0.5",
     "gulp-plumber": "^1.2.1",
     "gulp-watch": "^5.0.1",
     "husky": "^3.0.9",
+    "jest": "^26.4.2",
     "lint-staged": "^9.4.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "react": "^16.8.0",
     "react-dom": "^16.8.0",
+    "regenerator-runtime": "^0.13.7",
     "typescript": "^3.6.4"
   },
   "dependencies": {
+    "@testing-library/react-hooks": "^3.4.1",
     "@types/lodash": "^4.14.149",
     "@types/react": "^16.9.9",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
     "babel-eslint": "^10.0.3",
-    "chai": "^4.2.0",
     "chalk": "^3.0.0",
     "cli-table": "^0.3.1",
     "colors": "^1.4.0",
     "commander": "^2.20.3",
+    "enzyme": "^3.11.0",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-jsx-control-statements": "^2.2.1",
@@ -69,9 +75,9 @@
     "gulp": "^3.9.1",
     "gulp-typescript": "^5.0.1",
     "inquirer": "^7.0.3",
-    "mocha": "^6.2.2",
     "ora": "^4.0.3",
     "prettier": "^1.18.2",
+    "react-test-renderer": "^16.13.1",
     "shelljs": "^0.8.3",
     "ts-md5": "^1.2.7"
   },
