@@ -57,10 +57,7 @@ function useLifeCycle(deps?: Array<any>): LifeCycle {
     },
     clean: () => {
       // @ts-ignore
-      const result = lifeCycle.queue.mount();
-      if (result && typeof result === 'function') {
-        result();
-      } else {
+      if (typeof lifeCycle.queue.destroy === 'function') {
         // @ts-ignore
         lifeCycle.queue.destroy();
       }
