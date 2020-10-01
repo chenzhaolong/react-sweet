@@ -3,7 +3,7 @@
  */
 import { useMemo } from 'react';
 import { error, warning } from '../../utils/log';
-import { hasProperty } from '../../utils/tools';
+import { hasProperty, isType } from '../../utils/tools';
 
 type Value = { [key: string]: number | string };
 
@@ -20,11 +20,11 @@ function handleByObject(originStyle: Value, mapping: Mapping): object {
   return targetStyle;
 }
 
-function useStyle(style: Value, condition?: any, deps: Array<any> = []): object {
+function useSwitch(style: Value, condition: any, deps: Array<any> = []): object {
   const saveStyle = useMemo(() => {
-    if (condition && typeof condition === 'object') {
+    if (condition && isType('object', condition)) {
       return handleByObject(style, condition);
-    } else if (condition && typeof condition === 'function') {
+    } else if (condition && isType('function', condition)) {
       const handleStyle = condition(style);
       if (handleStyle) {
         return handleStyle;
@@ -33,6 +33,7 @@ function useStyle(style: Value, condition?: any, deps: Array<any> = []): object 
         return {};
       }
     } else {
+      debugger;
       error('the second params of useStyle must be object or function');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -41,4 +42,4 @@ function useStyle(style: Value, condition?: any, deps: Array<any> = []): object 
   return saveStyle;
 }
 
-export default useStyle;
+export default useSwitch;
