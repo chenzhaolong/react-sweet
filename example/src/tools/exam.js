@@ -144,7 +144,7 @@ function ComputedValue(props) {
       },
       deps: {date, wait: wait}
     }
-  })
+  });
   return (<div>
     <p>val1: {val1}</p>
     <p>val2: {val2}</p>
