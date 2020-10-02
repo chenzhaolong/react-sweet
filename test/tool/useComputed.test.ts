@@ -98,4 +98,37 @@ describe('test useComputed', () => {
     expect(result.current['b3']).toEqual(60);
     expect(fn3).toHaveBeenCalledTimes(3);
   });
+
+  it('one value has two and more deps', () => {
+    const fn = jest.fn();
+    const { rerender, result } = renderHook(
+      (props) => {
+        return useComputed({
+          demo: {
+            value() {
+              fn();
+              return props.a1 + props.a2;
+            },
+            deps: { a1: props.a1, a2: props.a2 }
+          }
+        });
+      },
+      { initialProps: { a1: 1, a2: 2, a3: 3 } }
+    );
+
+    expect(result.current['demo']).toEqual(3);
+    expect(fn).toHaveBeenCalledTimes(1);
+
+    rerender({ a1: 2, a2: 2, a3: 3 });
+    expect(result.current['demo']).toEqual(4);
+    expect(fn).toHaveBeenCalledTimes(2);
+
+    rerender();
+    expect(result.current['demo']).toEqual(4);
+    expect(fn).toHaveBeenCalledTimes(2);
+
+    rerender({ a1: 2, a2: 2, a3: 5 });
+    expect(result.current['demo']).toEqual(4);
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
 });
