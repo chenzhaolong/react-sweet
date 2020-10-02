@@ -1,7 +1,7 @@
 /**
  * @file the data structure for useState by input
  */
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { isType, getType } from '../../utils/tools';
 import { error } from '../../utils/log';
 import { set, get, cloneDeep } from 'lodash';
@@ -34,7 +34,7 @@ export function shadowEqual(obj1: object, obj2: object): boolean {
   });
 }
 
-function diffent(oldValue: any, newValue: any): boolean {
+function different(oldValue: any, newValue: any): boolean {
   const oldType = getType(oldValue);
   const newType = getType(newValue);
   if (oldType !== newType) {
@@ -71,24 +71,25 @@ function useData(value: object): ReturnValue {
   }
 
   const [data, setData] = useState(value);
-  const changeData = useCallback((path: string, newValue: any) => {
-    if (!isType('string', path)) {
-      error('the path in changeData must be string');
-    }
-    if (!path) {
-      error('the path in changeData can not be undefined!');
-    }
-    const oldValue = get(value, path, '');
-    if (diffent(oldValue, newValue)) {
-      const targetValue = set(data, path, newValue);
-      setData(cloneDeep(targetValue));
-    }
+
+  const changeData = useCallback((source: any) => {
+    return (path: string, newValue: any) => {
+      if (!isType('string', path)) {
+        error('the path in changeData must be string');
+      }
+      if (!path) {
+        error('the path in changeData can not be undefined!');
+      }
+      const oldValue = get(source, path, '');
+      if (different(oldValue, newValue)) {
+        const targetValue = set(source, path, newValue);
+        setData(cloneDeep(targetValue));
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  return useMemo(() => {
-    return { data, changeData };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [])(data);
+
+  return { data, changeData };
 }
 
 export default useData;
