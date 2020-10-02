@@ -2,6 +2,8 @@
  * @file the ref of component
  */
 import { useMemo } from 'react';
+import { isBoolean } from 'lodash';
+import { warning } from '../../utils/log';
 
 type condition1 = boolean;
 
@@ -17,6 +19,10 @@ function useCondition(options: Options, deps?: Array<any>): any {
   return useMemo(() => {
     const { yes, no, condition } = options;
     const result = typeof condition === 'function' ? condition() : condition;
+    if (!isBoolean(result)) {
+      warning('condition must return boolean in useCondition.');
+      return '';
+    }
     if (result) {
       return typeof yes === 'function' ? yes() : yes;
     } else {
