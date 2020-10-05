@@ -11,8 +11,8 @@ interface Fn {
   trigger: () => any;
 }
 
-function useMethod(data: any, fn: (val: any, args: Array<any>) => any): Fn {
-  const [value, setRender] = useState(data);
+function useMethod(initValue: any, fn: (val: any, args: Array<any>) => any, deps: Array<any> = []): Fn {
+  const [value, setRender] = useState(initValue);
   if (!isFunction(fn)) {
     error('the second params of input must be the type of function');
   }
@@ -21,7 +21,7 @@ function useMethod(data: any, fn: (val: any, args: Array<any>) => any): Fn {
       setRender((val: any) => fn(val, ...args));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, deps);
   return { value, trigger };
 }
 
