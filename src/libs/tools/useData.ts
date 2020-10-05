@@ -65,7 +65,7 @@ function different(oldValue: any, newValue: any): boolean {
   return true;
 }
 
-function useData(value: object): ReturnValue {
+function useData(value: any): ReturnValue {
   if (!isType('object', value)) {
     error('please check the type of input, the input of useData must be object type!');
   }

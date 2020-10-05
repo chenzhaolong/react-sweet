@@ -15,7 +15,7 @@ type Events = {
 
 interface Result {
   useSend: (name: string, publishByDiffMessage: boolean) => (data: any) => void;
-  useReceive: (name: string, callback: () => any) => void;
+  useReceive: (name: string, callback: (msg: any) => void) => any;
 }
 
 class ContextEvent {
@@ -89,7 +89,7 @@ function createContext(): Result {
       }, []);
       return send;
     },
-    useReceive(name: string, callback: () => any): void {
+    useReceive(name: string, callback: (msg: string) => any): void {
       const events = useCallback((callback) => {
         context.listener(name, callback);
         // eslint-disable-next-line react-hooks/exhaustive-deps
