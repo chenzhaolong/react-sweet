@@ -7,7 +7,7 @@ import { hasProperty, isArray } from '../../utils/tools';
 
 interface Options {
   time: number;
-  type: string;
+  type?: string;
 }
 
 function debounce(fn: () => any, delay: number): () => any {
@@ -57,8 +57,8 @@ function checkOptions(options: Options) {
     error('the second params of useFn can not be empty object!');
   }
 
-  if (!hasProperty(options, 'type') || !hasProperty(options, 'time')) {
-    error('the second params of useFn must has the property of "time" and "type"!');
+  if (!hasProperty(options, 'time')) {
+    error('the second params of useFn must has the property of "time"!');
   }
 }
 
