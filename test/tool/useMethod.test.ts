@@ -44,9 +44,9 @@ describe('test useMethod', () => {
   it('test the deps', () => {
     const { result, rerender } = renderHook(
       (props) => {
-        // @ts-ignore
         return useMethod(
           10,
+          // @ts-ignore
           (value, other = 0) => {
             return value + props.num + other;
           },

@@ -26,7 +26,7 @@ function useAwait(callback: any, deps?: Array<any>): Result {
       error: ''
     });
     const promise = callback();
-    if (!isPromise(promise)) {
+    if (!promise || !isPromise(promise)) {
       error('the input params must be Promise, please make sure your input whether Promise is.');
     } else {
       promise
