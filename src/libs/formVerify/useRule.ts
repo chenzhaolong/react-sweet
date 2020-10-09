@@ -1,6 +1,7 @@
 /**
  * the rule of form input
  * todo: 后续的版本可以考虑将校验和组件组合在一起，成为校验型高阶组件
+ * todo: 自定义的rule函数支持promise格式
  */
 import { useState, useCallback, useMemo } from 'react';
 import Rules from '../../utils/verifyRules';

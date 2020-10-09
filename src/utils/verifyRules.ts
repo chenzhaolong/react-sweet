@@ -53,7 +53,7 @@ export default {
     if (!val) {
       return false;
     }
-    const str = /[!@#$%^&*()+?\\\/\-【】（ ）「」{}，]+/;
+    const str = /[!@#$%^&*()+?\\\/\-【】（ ）「」{}，,.。]+/;
     const regExp = new RegExp(str, 'g');
     return !regExp.test(val);
   }
