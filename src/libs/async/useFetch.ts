@@ -10,6 +10,7 @@ interface Result {
   response: any;
   startFetch: (params: any) => any;
   loading: boolean;
+  error: any;
 }
 
 interface Options {
@@ -18,14 +19,16 @@ interface Options {
   onError?: (error: any) => void;
   onSuccess?: (data: any, setResponse: (data: any) => any) => void;
   closeLoading?: boolean;
+  cleanWhenError?: boolean;
 }
 
 type Fetch = (params: any) => Promise<any>;
 
 function useFetch(fetch: Fetch, options: Options = {}): Result {
-  const { initValue = {}, path, onError, onSuccess, closeLoading = false } = options;
+  const { initValue = {}, path, onError, onSuccess, closeLoading = false, cleanWhenError = true } = options;
   const [response, setResponse] = useState(initValue);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setError] = useState('');
 
   const startFetch = useCallback((params: any) => {
     !closeLoading && setLoading(true);
@@ -37,6 +40,7 @@ function useFetch(fetch: Fetch, options: Options = {}): Result {
         .then((response: any) => {
           const data = path ? get(response, path) : response;
           !closeLoading && setLoading(false);
+          setError('');
           if (isFunction(onSuccess)) {
             onSuccess(data, setResponse);
           } else {
@@ -45,17 +49,14 @@ function useFetch(fetch: Fetch, options: Options = {}): Result {
         })
         .catch((e: any) => {
           !closeLoading && setLoading(false);
-          if (onError && isFunction(onError)) {
-            const data = onError(e);
-            setResponse(data || {});
-          } else {
-            throw e;
-          }
+          const errorObj = onError && isFunction(onError) ? onError(e) || 'error' : e;
+          setError(errorObj);
+          cleanWhenError && setResponse('');
         });
     }
   }, []);
 
-  return { response, startFetch, loading };
+  return { response, startFetch, loading, error: errorMsg };
 }
 
 export default useFetch;
