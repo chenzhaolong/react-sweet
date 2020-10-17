@@ -8,7 +8,7 @@ import { get, isFunction } from 'lodash';
 
 interface Result {
   response: any;
-  startFetch: (params: any) => any;
+  startFetch: (params?: any) => any;
   loading: boolean;
   isError: boolean;
 }
