@@ -8,11 +8,13 @@ afterEach(() => {
 describe('test useFetch', () => {
   const ajax = (params: any) => {
     return new Promise((res, rej) => {
-      if (params.id > 3) {
-        res('yes');
-      } else {
-        rej('no');
-      }
+      setTimeout(() => {
+        if (params.id > 3) {
+          res('yes');
+        } else {
+          rej('no');
+        }
+      }, 500);
     });
   };
 
@@ -25,7 +27,7 @@ describe('test useFetch', () => {
 
     expect(result.current.response).toEqual('test');
     expect(result.current.loading).toEqual(false);
-    expect(result.current.error).toEqual('');
+    expect(result.current.isError).toEqual(false);
 
     act(() => {
       result.current.startFetch({ id: 5 });
@@ -34,16 +36,16 @@ describe('test useFetch', () => {
     await waitForNextUpdate(() => result.current);
     expect(result.current.response).toEqual('yes');
     expect(result.current.loading).toEqual(false);
-    expect(result.current.error).toEqual('');
+    expect(result.current.isError).toEqual(false);
 
     act(() => {
       result.current.startFetch({ id: 1 });
     });
     // @ts-ignore
     await waitForNextUpdate(() => result.current);
-    expect(result.current.response).toEqual('');
+    expect(result.current.response).toEqual('yes');
     expect(result.current.loading).toEqual(false);
-    expect(result.current.error).toEqual('no');
+    expect(result.current.isError).toEqual(true);
 
     act(() => {
       result.current.startFetch({ id: 6 });
@@ -52,6 +54,6 @@ describe('test useFetch', () => {
     await waitForNextUpdate(() => result.current);
     expect(result.current.response).toEqual('yes');
     expect(result.current.loading).toEqual(false);
-    expect(result.current.error).toEqual('');
+    expect(result.current.isError).toEqual(false);
   });
 });

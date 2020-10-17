@@ -10,25 +10,25 @@ interface Result {
   response: any;
   startFetch: (params: any) => any;
   loading: boolean;
-  error: any;
+  isError: boolean;
 }
 
 interface Options {
   initValue?: any;
   path?: string;
-  onError?: (error: any) => void;
+  onError?: (error: any, setResponse: (data: any) => any) => void;
   onSuccess?: (data: any, setResponse: (data: any) => any) => void;
   closeLoading?: boolean;
-  cleanWhenError?: boolean;
+  deps?: Array<any>;
 }
 
 type Fetch = (params: any) => Promise<any>;
 
 function useFetch(fetch: Fetch, options: Options = {}): Result {
-  const { initValue = {}, path, onError, onSuccess, closeLoading = false, cleanWhenError = true } = options;
+  const { initValue = {}, path, onError, onSuccess, closeLoading = false, deps = [] } = options;
   const [response, setResponse] = useState(initValue);
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setError] = useState('');
+  const [isError, setError] = useState(false);
 
   const startFetch = useCallback((params: any) => {
     !closeLoading && setLoading(true);
@@ -40,7 +40,7 @@ function useFetch(fetch: Fetch, options: Options = {}): Result {
         .then((response: any) => {
           const data = path ? get(response, path) : response;
           !closeLoading && setLoading(false);
-          setError('');
+          setError(false);
           if (isFunction(onSuccess)) {
             onSuccess(data, setResponse);
           } else {
@@ -49,14 +49,15 @@ function useFetch(fetch: Fetch, options: Options = {}): Result {
         })
         .catch((e: any) => {
           !closeLoading && setLoading(false);
-          const errorObj = onError && isFunction(onError) ? onError(e) || 'error' : e;
-          setError(errorObj);
-          cleanWhenError && setResponse('');
+          setError(true);
+          if (onError && isFunction(onError)) {
+            onError(e, setResponse);
+          }
         });
     }
-  }, []);
+  }, deps);
 
-  return { response, startFetch, loading, error: errorMsg };
+  return { response, startFetch, loading, isError };
 }
 
 export default useFetch;
