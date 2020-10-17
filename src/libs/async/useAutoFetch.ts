@@ -26,6 +26,7 @@ interface Options {
 interface Result {
   readonly response?: object;
   loading?: boolean;
+  isError: boolean;
 }
 
 function useAutoFetch(fetchList: FetchList, options: Options): Result {
@@ -43,6 +44,7 @@ function useAutoFetch(fetchList: FetchList, options: Options): Result {
   } = options;
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(initValue || {});
+  const [isError, setError] = useState(false);
   const render = useRef({ isFirstRender: true });
   const loadingFn = useCallback((isLoading) => {
     !closeLoading && setLoading(isLoading);
@@ -64,6 +66,7 @@ function useAutoFetch(fetchList: FetchList, options: Options): Result {
     promiseFn
       .then((data: Array<any>) => {
         loadingFn(false);
+        setError(false);
         if (isFunction(onSuccess)) {
           onSuccess(data, setResponse);
         } else {
@@ -72,16 +75,14 @@ function useAutoFetch(fetchList: FetchList, options: Options): Result {
       })
       .catch((e) => {
         loadingFn(false);
-        if (isFunction(onError)) {
-          const data = onError(e);
-          setResponse(data || response);
-        } else {
-          throw e;
+        setError(true);
+        if (onError && isFunction(onError)) {
+          onError(e, setResponse);
         }
       });
   }, realDeps);
 
-  return { response, loading };
+  return { response, loading, isError };
 }
 
 export default useAutoFetch;
