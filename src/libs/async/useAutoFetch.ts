@@ -15,11 +15,11 @@ enum AutoFetchTimeType {
 }
 
 interface Options {
-  initValue?: { [key: string]: any };
-  onError?: (e: Error) => any;
+  initValue?: any;
+  onError?: (e: Error, setData: (data: any) => void) => void;
   onSuccess?: (data: object, setData: (data: any) => void) => void;
   closeLoading?: boolean;
-  deps?: Array<any>;
+  updateDeps?: Array<any>;
   autoFetchMoment?: AutoFetchTimeType;
 }
 
@@ -40,7 +40,7 @@ function useAutoFetch(fetchList: FetchList, options: Options): Result {
     onSuccess,
     autoFetchMoment = AutoFetchTimeType.MOUNT,
     closeLoading = false,
-    deps = []
+    updateDeps = []
   } = options;
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(initValue || {});
@@ -50,7 +50,7 @@ function useAutoFetch(fetchList: FetchList, options: Options): Result {
     !closeLoading && setLoading(isLoading);
   }, []);
 
-  const realDeps = autoFetchMoment === AutoFetchTimeType.MOUNT ? [] : deps;
+  const realDeps = autoFetchMoment === AutoFetchTimeType.MOUNT ? [] : updateDeps;
 
   useEffect(() => {
     // 如果是update，则首次不fetch
