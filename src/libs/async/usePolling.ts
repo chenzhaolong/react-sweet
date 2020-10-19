@@ -13,13 +13,14 @@ interface Polling {
   loading: boolean;
   start: (params: any) => any;
   reset: (initData?: any) => void;
+  isError: boolean;
 }
 
 interface Options {
   intervalTime: number;
   terminate: (data: any) => boolean;
   initValue?: any;
-  onError?: (error: any) => any;
+  onError?: (error: any, setResponse: (data: any) => any) => any;
   onSuccess?: (data: any, setResponse: (data: any) => any) => void;
   onCompleteByLimitNumber?: (setResponse: (data: any) => any) => void;
   onCompleteByLimitTime?: (setResponse: (data: any) => any) => void;
@@ -27,9 +28,10 @@ interface Options {
   limitPollingNumber?: number;
   limitPollingTime?: number;
   closeLoading?: boolean;
+  deps?: Array<any>;
 }
 
-type Func = () => any;
+type Func = (params?: any) => any;
 
 function usePolling(callback: Func, options: Options): Polling {
   const {
@@ -43,7 +45,8 @@ function usePolling(callback: Func, options: Options): Polling {
     onSuccess,
     onCompleteByLimitNumber,
     onCompleteByLimitTime,
-    onReset
+    onReset,
+    deps = []
   } = options;
 
   if (!isFunction(terminate)) {
@@ -58,6 +61,7 @@ function usePolling(callback: Func, options: Options): Polling {
 
   const [response, setResponse] = useState(initValue || {});
   const [loading, setLoading] = useState(false);
+  const [isError, setError] = useState(false);
   const pollingInfo = useRef({ number: 0, currentTime: 0, isStop: false, timer: null, destroy: false });
 
   const clearTimer = useCallback((timer: any) => {
@@ -108,6 +112,7 @@ function usePolling(callback: Func, options: Options): Polling {
     } else {
       promise
         .then((response: any) => {
+          setError(false);
           const isNotPolling = terminate(response);
           if (!isBoolean(isNotPolling)) {
             error('the return of terminate must be Boolean type.');
@@ -132,15 +137,13 @@ function usePolling(callback: Func, options: Options): Polling {
         })
         .catch((e: any) => {
           clearTimer(pollingInfo.current.timer);
+          setError(true);
           if (onError && isFunction(onError)) {
-            const data = onError(e);
-            setResponse(data || {});
-          } else {
-            throw e;
+            onError(e, setResponse);
           }
         });
     }
-  }, []);
+  }, deps);
 
   const reset = useCallback((initData: any) => {
     pollingInfo.current.isStop = true;
@@ -156,7 +159,7 @@ function usePolling(callback: Func, options: Options): Polling {
   // 销毁时清除定时器
   useEffect(() => {
     return () => {
-      console.log('destory');
+      // console.log('destory');
       pollingInfo.current.isStop = true;
       // 防止在销毁组件时还存在一条异步请求，执行state更新
       pollingInfo.current.destroy = true;
@@ -164,7 +167,7 @@ function usePolling(callback: Func, options: Options): Polling {
     };
   }, []);
 
-  return { response, start, reset, loading };
+  return { response, start, reset, loading, isError };
 }
 
 export default usePolling;
