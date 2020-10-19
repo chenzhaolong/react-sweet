@@ -64,8 +64,9 @@ function usePolling(callback: Func, options: Options): Polling {
   const [isError, setError] = useState(false);
   const pollingInfo = useRef({ number: 0, currentTime: 0, isStop: false, timer: null, destroy: false });
 
-  const clearTimer = useCallback((timer: any) => {
+  const clearTimer = useCallback((timer: any, isError = false) => {
     setLoading(false);
+    setError(isError);
     // @ts-ignore
     timer && clearTimeout(timer);
     pollingInfo.current.timer = null;
@@ -112,7 +113,6 @@ function usePolling(callback: Func, options: Options): Polling {
     } else {
       promise
         .then((response: any) => {
-          setError(false);
           const isNotPolling = terminate(response);
           if (!isBoolean(isNotPolling)) {
             error('the return of terminate must be Boolean type.');
@@ -136,8 +136,7 @@ function usePolling(callback: Func, options: Options): Polling {
           }
         })
         .catch((e: any) => {
-          clearTimer(pollingInfo.current.timer);
-          setError(true);
+          clearTimer(pollingInfo.current.timer, true);
           if (onError && isFunction(onError)) {
             onError(e, setResponse);
           }
@@ -159,7 +158,6 @@ function usePolling(callback: Func, options: Options): Polling {
   // 销毁时清除定时器
   useEffect(() => {
     return () => {
-      // console.log('destory');
       pollingInfo.current.isStop = true;
       // 防止在销毁组件时还存在一条异步请求，执行state更新
       pollingInfo.current.destroy = true;
