@@ -15,16 +15,16 @@ export class Async extends Component {
       <div>
         {/*<CheckMountFetch />*/}
         {/*<CheckFetchAll id={this.state.changeId}/>*/}
-        {/* {this.state.show ? <CheckPolling id={this.state.changeId} /> : null} */}
+         {this.state.show ? <CheckPolling id={this.state.changeId} /> : null}
         {/*<CheckRely id={this.state.changeId}/>*/}
-        <FileCom/>
+        {/*<FileCom/>*/}
         {/*<button onClick={(e) => {*/}
         {/*  this.setState({ changeId: this.state.changeId + 2 });*/}
         {/*}}>点击-{this.state.changeId}</button>*/}
-        {/*<button onClick={() => {*/}
-        {/*  this.setState({ show: !this.state.show });*/}
-        {/*}}>消失/显示 checkPolling*/}
-        {/*</button>*/}
+        <button onClick={() => {
+          this.setState({ show: !this.state.show });
+        }}>消失/显示 checkPolling
+        </button>
         {/*<CheckUseFetch/>*/}
       </div>
     );

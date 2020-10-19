@@ -18,9 +18,9 @@ class App extends Component {
         {/* <Life /> */}
         {/*<Tools />*/}
         {/*<Native />*/}
-        {/*<Async />*/}
+        <Async />
         {/* <Form />*/}
-        <StoreComponent />
+        {/*<StoreComponent />*/}
       </div>
     )
   }
