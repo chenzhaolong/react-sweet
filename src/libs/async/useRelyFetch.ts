@@ -2,18 +2,19 @@
  * @file the fetch base on the dependent relationship between two api
  */
 import { useState, useCallback } from 'react';
-import { isFunction, isObject } from 'lodash';
+import { isFunction, isObject, isArray } from 'lodash';
 import { error } from '../../utils/log';
 import { isPromise, hasProperty } from '../../utils/tools';
 
 interface Options {
   main: (params: any) => Promise<any>; // 提供项
-  rely: (params: Params1) => Promise<any>; // 依赖项
+  rely: (params: any) => Promise<any>; // 依赖项
   initValue?: any;
   paramsFn?: (params: Params1) => any;
   onSuccess?: (response: Params, setResponse: (mainData: any, relyData: any) => any) => void;
   onError?: (error: any, type: string, setResponse: (mainData: any, relyData: any) => any) => void;
-  closeLoading: boolean;
+  closeLoading?: boolean;
+  deps?: Array<any>;
 }
 
 interface Params1 {
@@ -38,8 +39,8 @@ interface Result {
   isError: boolean;
 }
 
-function useRelyFetch(options: Options, deps: Array<any>): Result {
-  const { main, rely, initValue = {}, paramsFn, onSuccess, onError, closeLoading = false } = options;
+function useRelyFetch(options: Options): Result {
+  const { main, rely, initValue = {}, paramsFn, onSuccess, onError, closeLoading = false, deps } = options;
   if (!isFunction(main)) {
     error('the main of options must be exist and be Promise type.');
   }
@@ -60,7 +61,7 @@ function useRelyFetch(options: Options, deps: Array<any>): Result {
     }
   }
 
-  deps = deps || [];
+  const realDeps = isArray(deps) ? deps : [];
   const [response, setResponse] = useState(initValue || { mainData: {}, relyData: {} });
   const [loading, setLoading] = useState(false);
   const [isError, setError] = useState(false);
@@ -114,7 +115,7 @@ function useRelyFetch(options: Options, deps: Array<any>): Result {
         setError(true);
         isFunction(onError) && onError(error, 'main', setData);
       });
-  }, deps);
+  }, realDeps);
 
   return { response, start, loading, isError };
 }
