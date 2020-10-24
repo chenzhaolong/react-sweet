@@ -35,6 +35,7 @@ interface Result {
   response: Params;
   start: (params: Params2) => any;
   loading: boolean;
+  isError: boolean;
 }
 
 function useRelyFetch(options: Options, deps: Array<any>): Result {
@@ -62,6 +63,7 @@ function useRelyFetch(options: Options, deps: Array<any>): Result {
   deps = deps || [];
   const [response, setResponse] = useState(initValue || { mainData: {}, relyData: {} });
   const [loading, setLoading] = useState(false);
+  const [isError, setError] = useState(false);
 
   const loadFn = useCallback((status: boolean) => {
     !closeLoading && setLoading(status);
@@ -94,6 +96,7 @@ function useRelyFetch(options: Options, deps: Array<any>): Result {
         relyPromise
           .then((relyData: any) => {
             loadFn(false);
+            setError(false);
             if (isFunction(onSuccess)) {
               onSuccess({ relyData, mainData }, setData);
             } else {
@@ -102,24 +105,18 @@ function useRelyFetch(options: Options, deps: Array<any>): Result {
           })
           .catch((error: Error) => {
             loadFn(false);
-            if (isFunction(onError)) {
-              onError(error, 'rely', setData);
-            } else {
-              throw error;
-            }
+            setError(true);
+            isFunction(onError) && onError(error, 'rely', setData);
           });
       })
       .catch((error: Error) => {
         loadFn(false);
-        if (isFunction(onError)) {
-          onError(error, 'main', setData);
-        } else {
-          throw error;
-        }
+        setError(true);
+        isFunction(onError) && onError(error, 'main', setData);
       });
   }, deps);
 
-  return { response, start, loading };
+  return { response, start, loading, isError };
 }
 
 export default useRelyFetch;
