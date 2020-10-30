@@ -80,6 +80,7 @@ function useRules(options: Options): Result {
     // for number case
     const realVal = isType('object', newValue) ? newValue.val : newValue;
     let effect: Options1 = {};
+
     if (isType('object', options1)) {
       // @ts-ignore
       effect = options1;
@@ -87,10 +88,12 @@ function useRules(options: Options): Result {
       // @ts-ignore
       effect = { success: options1 };
     }
+
     const temp: Format = values;
     const tempLogs: Format = logs;
     const resForKey = verifyRules[key](newValue);
     tempLogs[key] = resForKey;
+
     if (resForKey) {
       effect.success && effect.success();
       temp[key] = realVal;
@@ -102,6 +105,7 @@ function useRules(options: Options): Result {
         temp[key] = realVal;
       }
     }
+
     const resForAllKey = targetKeys.every((key: string) => tempLogs[key]);
     setResult(resForAllKey);
     setValues({ ...temp });

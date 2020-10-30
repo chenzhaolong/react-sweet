@@ -16,10 +16,10 @@ interface Result {
 
 interface Options {
   success?: () => any;
-  fail?: (error?: any) => any;
+  fail?: () => any;
 }
 
-function useRule(rule: any, initValue: any, isCleanWhenError = false): Result {
+function useRule(rule: any, initValue: any, isCleanWhenError = false, deps: Array<any> = []): Result {
   const [value, setValue] = useState(initValue || '');
 
   const verifyRule = useMemo(() => {
@@ -57,20 +57,17 @@ function useRule(rule: any, initValue: any, isCleanWhenError = false): Result {
 
     const result = verifyRule(newValue);
     if (isPromise(result)) {
-      result
+      return result
         .then((d: any) => {
           reaction(d);
+          return d;
         })
         .catch((e: any) => {
-          effect.fail && effect.fail(e);
-          if (isCleanWhenError) {
-            setValue('');
-          } else {
-            setValue(realVal);
-          }
+          throw e;
         });
     } else {
       reaction(result);
+      return result;
     }
 
     // if (isType('boolean', isHideWhenError)) {
@@ -82,8 +79,7 @@ function useRule(rule: any, initValue: any, isCleanWhenError = false): Result {
     // } else {
     //   setValue('');
     // }
-    return result;
-  }, []);
+  }, deps);
 
   return { value, verify };
 }
