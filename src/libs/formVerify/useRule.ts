@@ -5,8 +5,9 @@
  */
 import { useState, useCallback, useMemo } from 'react';
 import Rules from '../../utils/verifyRules';
-import { isType, getRuleFn } from '../../utils/tools';
+import { isType, getRuleFn, isPromise } from '../../utils/tools';
 import { error } from '../../utils/log';
+import { isBoolean } from 'lodash';
 
 interface Result {
   value: any;
@@ -15,7 +16,7 @@ interface Result {
 
 interface Options {
   success?: () => any;
-  fail?: () => any;
+  fail?: (error?: any) => any;
 }
 
 function useRule(rule: any, initValue: any, isCleanWhenError = false): Result {
@@ -32,29 +33,55 @@ function useRule(rule: any, initValue: any, isCleanWhenError = false): Result {
     } else if (isType('function', options)) {
       effect = { success: options };
     }
+
     // for number case
     const realVal = isType('object', newValue) ? newValue.val : newValue;
-    const result = verifyRule(newValue);
-    if (result) {
-      effect.success && effect.success();
-      setValue(realVal);
-    } else {
-      effect.fail && effect.fail();
-      if (isCleanWhenError) {
-        setValue('');
+
+    const reaction = (result: boolean) => {
+      if (isBoolean(result)) {
+        if (result) {
+          effect.success && effect.success();
+          setValue(realVal);
+        } else {
+          effect.fail && effect.fail();
+          if (isCleanWhenError) {
+            setValue('');
+          } else {
+            setValue(realVal);
+          }
+        }
       } else {
-        setValue(realVal);
+        error('the result after verify must be boolean when use useRule.');
       }
-      // if (isType('boolean', isHideWhenError)) {
-      //   if (isHideWhenError || !realVal) {
-      //     setValue('');
-      //   } else {
-      //     setValue(realVal);
-      //   }
-      // } else {
-      //   setValue('');
-      // }
+    };
+
+    const result = verifyRule(newValue);
+    if (isPromise(result)) {
+      result
+        .then((d: any) => {
+          reaction(d);
+        })
+        .catch((e: any) => {
+          effect.fail && effect.fail(e);
+          if (isCleanWhenError) {
+            setValue('');
+          } else {
+            setValue(realVal);
+          }
+        });
+    } else {
+      reaction(result);
     }
+
+    // if (isType('boolean', isHideWhenError)) {
+    //   if (isHideWhenError || !realVal) {
+    //     setValue('');
+    //   } else {
+    //     setValue(realVal);
+    //   }
+    // } else {
+    //   setValue('');
+    // }
     return result;
   }, []);
 
