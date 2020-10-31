@@ -3,9 +3,9 @@
  * todo:后续支持外部注册规则表，然后直接在rule填写外部规则名
  */
 import { useCallback, useMemo, useState } from 'react';
-import { getRuleFn, isType } from '../../utils/tools';
+import { getRuleFn, isType, isPromise } from '../../utils/tools';
 import { error } from '../../utils/log';
-import { get } from 'lodash';
+import { get, isBoolean } from 'lodash';
 import Rules from '../../utils/verifyRules';
 
 type Format = { [key: string]: any };
@@ -30,7 +30,7 @@ interface Result {
   };
 }
 
-function useRules(options: Options): Result {
+function useRules(options: Options, deps: Array<any> = []): Result {
   if (!isType('object', options)) {
     error('the options of input params must be object');
   }
@@ -45,11 +45,11 @@ function useRules(options: Options): Result {
     targetKeys.forEach((key: string) => {
       targetRules[key] = get(options, `${key}.rule`, '');
       targetInitValues[key] = get(options, `${key}.initValue`, '');
-      targetLogs[key] = false;
+      targetLogs[key] = '';
       targetCleanWhenError[key] = get(options, `${key}.isCleanWhenError`, false);
     });
     return { targetRules, targetInitValues, targetLogs, targetKeys, targetCleanWhenError };
-  }, []);
+  }, deps);
 
   const [values, setValues] = useState(targetInitValues);
 
@@ -67,7 +67,7 @@ function useRules(options: Options): Result {
       });
     });
     return fn;
-  }, []);
+  }, deps);
 
   const verify = useCallback((key: string, newValue: any, options1?: Options1) => {
     if (!isType('string', key)) {
@@ -89,29 +89,56 @@ function useRules(options: Options): Result {
       effect = { success: options1 };
     }
 
-    const temp: Format = values;
-    const tempLogs: Format = logs;
     const resForKey = verifyRules[key](newValue);
-    tempLogs[key] = resForKey;
 
-    if (resForKey) {
-      effect.success && effect.success();
-      temp[key] = realVal;
-    } else {
-      effect.fail && effect.fail();
-      if (targetCleanWhenError[key]) {
-        temp[key] = '';
-      } else {
-        temp[key] = realVal;
+    const reaction = (resForKey1: boolean, updateValues = true) => {
+      if (!isBoolean(resForKey1)) {
+        error('the result after verify must be boolean when use useRules.');
       }
-    }
 
-    const resForAllKey = targetKeys.every((key: string) => tempLogs[key]);
-    setResult(resForAllKey);
-    setValues({ ...temp });
-    setLogs({ ...tempLogs });
-    return resForKey;
-  }, []);
+      const temp: Format = values;
+      const tempLogs: Format = logs;
+      tempLogs[key] = resForKey1;
+
+      if (resForKey1) {
+        effect.success && effect.success();
+        temp[key] = realVal;
+      } else {
+        effect.fail && effect.fail();
+        if (targetCleanWhenError[key]) {
+          updateValues = true;
+          temp[key] = '';
+        } else {
+          temp[key] = realVal;
+        }
+      }
+
+      const resForAllKey = targetKeys.every((key: string) => tempLogs[key] && true);
+      setResult(resForAllKey);
+      updateValues && setValues({ ...temp });
+      setLogs({ ...tempLogs });
+    };
+
+    // 存在校验函数是异步
+    if (isPromise(resForKey)) {
+      // 由于promise异步关系，先更新输入框，避免出现输入框卡顿现象。
+      const temp: Format = values;
+      temp[key] = realVal;
+      setValues({ ...temp });
+      return resForKey
+        .then((d: any) => {
+          reaction(d, false);
+          return d;
+        })
+        .catch(() => {
+          reaction(false, false);
+          return false;
+        });
+    } else {
+      reaction(resForKey);
+      return resForKey;
+    }
+  }, deps);
 
   return { values, verify, logs, result };
 }

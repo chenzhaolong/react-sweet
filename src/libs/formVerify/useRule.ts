@@ -10,7 +10,7 @@ import { isBoolean } from 'lodash';
 
 interface Result {
   value: any;
-  isPass: boolean;
+  isPass: any;
   verify: (newValue: any, options?: Options) => void;
 }
 
@@ -21,7 +21,7 @@ interface Options {
 
 function useRule(rule: any, initValue: any, isCleanWhenError = false, deps: Array<any> = []): Result {
   const [value, setValue] = useState(initValue || '');
-  const [isPass, setPass] = useState(true);
+  const [isPass, setPass] = useState('');
 
   const verifyRule = useMemo(() => {
     return getRuleFn({ rule, Rules, error });
@@ -38,19 +38,21 @@ function useRule(rule: any, initValue: any, isCleanWhenError = false, deps: Arra
     // for number case
     const realVal = isType('object', newValue) ? newValue.val : newValue;
 
-    const reaction = (result: boolean) => {
+    const reaction = (result: boolean, updateValues = true) => {
       if (isBoolean(result)) {
         if (result) {
           effect.success && effect.success();
-          setValue(realVal);
+          updateValues && setValue(realVal);
+          // @ts-ignore
           setPass(true);
         } else {
           effect.fail && effect.fail();
+          // @ts-ignore
           setPass(false);
           if (isCleanWhenError) {
             setValue('');
           } else {
-            setValue(realVal);
+            updateValues && setValue(realVal);
           }
         }
       } else {
@@ -59,16 +61,22 @@ function useRule(rule: any, initValue: any, isCleanWhenError = false, deps: Arra
     };
 
     const result = verifyRule(newValue);
+    // 存在校验函数是异步
     if (isPromise(result)) {
-      result
+      // 由于promise异步关系，先更新输入框，避免出现输入框卡顿现象。
+      setValue(realVal);
+      return result
         .then((d: any) => {
-          reaction(d);
+          reaction(d, false);
+          return d;
         })
         .catch(() => {
-          reaction(false);
+          reaction(false, false);
+          return false;
         });
     } else {
       reaction(result);
+      return result;
     }
   }, deps);
 

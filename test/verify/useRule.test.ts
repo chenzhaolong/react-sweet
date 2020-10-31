@@ -259,7 +259,7 @@ describe('test useRule', () => {
       }, 'obj6');
     });
     expect(result.current.value).toEqual('obj6');
-    expect(result.current.isPass).toEqual(true);
+    expect(result.current.isPass).toEqual('');
 
     act(() => {
       result.current.verify(10);
@@ -344,7 +344,7 @@ describe('test useRule', () => {
       { initialProps: { id: 1 } }
     );
     expect(result.current.value).toEqual('obj6');
-    expect(result.current.isPass).toEqual(true);
+    expect(result.current.isPass).toEqual('');
 
     act(() => {
       result.current.verify(3);

@@ -4,6 +4,7 @@
 
 import React, {Component, useEffect, useState, useMemo} from 'react'
 import { useRule, useRules } from '../../react-sweet/src';
+import {isBoolean} from 'lodash'
 
 export class Form extends Component {
   state = {
@@ -114,14 +115,21 @@ function CheckInputAll(props) {
     b: {rule: 'number', initValue: 1, isCleanWhenError: true},
     c: {rule: /[!@#$%]+/, initValue: '2'},
     d: {rule: function(val) {
-        return !/[!@#$%]+/.test(val);
-      }, initValue: '12'}
+        return new Promise((res) => {
+          setTimeout(() => {
+            if (!val) {
+              res(false)
+            }
+            res(!/[!@#$%]+/.test(val));
+          }, 1000)
+        })
+      }}
   });
 
   useEffect(() => {
     console.log('result', result);
     console.log('logs', logs);
-    console.log('values', values);
+    // console.log('values', values);
   });
 
   return <div>
@@ -162,12 +170,15 @@ function CheckInputAll(props) {
     }} />
     <br />
     <input value={values.d} onChange={e => {
+      console.log('loading');
       verify('d', e.target.value, {
         fail() {
+          console.log('end loading');
           console.log('有特殊字符');
           return false;
         }
       });
     }} />
+    {isBoolean(logs.d) && !logs.d && <div style={{color: 'red'}}>error</div>}
   </div>
 }
