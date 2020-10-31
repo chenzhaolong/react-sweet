@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "publish": "sh ./bin/publish.sh",
+    "pub": "sh ./bin/publish.sh",
     "debug": "gulp compiler",
     "eslint": "eslint --ext .tsx,.ts --fix ./src",
     "test": "jest"
