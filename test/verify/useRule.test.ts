@@ -7,7 +7,23 @@ afterEach(() => {
 
 describe('test useRule', () => {
   const success = jest.fn();
+
   const fail = jest.fn();
+
+  const fetch = (id: number) => {
+    return new Promise((res, rej) => {
+      setTimeout(() => {
+        if (!id) {
+          return rej(new Error('error'));
+        }
+        if (id > 3) {
+          res('success');
+        } else {
+          res('fail');
+        }
+      }, 500);
+    });
+  };
 
   it('test the rule is wordNum', () => {
     const { result } = renderHook(() => {
@@ -228,5 +244,132 @@ describe('test useRule', () => {
     expect(result.current.value).toEqual('');
     expect(success).toHaveBeenCalledTimes(1);
     expect(fail).toHaveBeenCalledTimes(1);
+  });
+
+  it('test the rule is promise function', async () => {
+    const { result, waitForNextUpdate } = renderHook(() => {
+      return useRule((val: any) => {
+        return fetch(val)
+          .then((d) => {
+            return d === 'success';
+          })
+          .catch((e) => {
+            throw e;
+          });
+      }, 'obj6');
+    });
+    expect(result.current.value).toEqual('obj6');
+    expect(result.current.isPass).toEqual(false);
+
+    act(() => {
+      result.current.verify(10);
+    });
+    // @ts-ignore
+    await waitForNextUpdate(() => result.current);
+    expect(result.current.value).toEqual(10);
+    expect(result.current.isPass).toEqual(true);
+
+    act(() => {
+      result.current.verify(2);
+    });
+    // @ts-ignore
+    await waitForNextUpdate(() => result.current);
+    expect(result.current.value).toEqual(2);
+    expect(result.current.isPass).toEqual(false);
+
+    act(() => {
+      result.current.verify(10);
+    });
+    // @ts-ignore
+    await waitForNextUpdate(() => result.current);
+    expect(result.current.value).toEqual(10);
+    expect(result.current.isPass).toEqual(true);
+
+    act(() => {
+      // @ts-ignore
+      result.current.verify('');
+    });
+    // @ts-ignore
+    await waitForNextUpdate(() => result.current);
+    expect(result.current.value).toEqual('');
+    expect(result.current.isPass).toEqual(false);
+
+    act(() => {
+      // @ts-ignore
+      result.current.verify(7, {
+        success: success,
+        fail: fail
+      });
+    });
+    // @ts-ignore
+    await waitForNextUpdate(() => result.current);
+    expect(result.current.value).toEqual(7);
+    expect(result.current.isPass).toEqual(true);
+    expect(success).toHaveBeenCalledTimes(1);
+    expect(fail).toHaveBeenCalledTimes(0);
+
+    act(() => {
+      // @ts-ignore
+      result.current.verify(1, {
+        success: success,
+        fail: fail
+      });
+    });
+    // @ts-ignore
+    await waitForNextUpdate(() => result.current);
+    expect(result.current.value).toEqual(1);
+    expect(result.current.isPass).toEqual(false);
+    expect(success).toHaveBeenCalledTimes(1);
+    expect(fail).toHaveBeenCalledTimes(1);
+  });
+
+  it('test the deps', async () => {
+    const { result, waitForNextUpdate, rerender } = renderHook(
+      (props) => {
+        return useRule(
+          (val: any) => {
+            return fetch(props.id + val)
+              .then((d) => {
+                return d === 'success';
+              })
+              .catch((e) => {
+                throw e;
+              });
+          },
+          'obj6',
+          false,
+          [props.id]
+        );
+      },
+      { initialProps: { id: 1 } }
+    );
+    expect(result.current.value).toEqual('obj6');
+    expect(result.current.isPass).toEqual(false);
+
+    act(() => {
+      result.current.verify(3);
+    });
+    // @ts-ignore
+    await waitForNextUpdate(() => result.current);
+    expect(result.current.value).toEqual(3);
+    expect(result.current.isPass).toEqual(true);
+
+    rerender({ id: -1 });
+    act(() => {
+      result.current.verify(4);
+    });
+    // @ts-ignore
+    await waitForNextUpdate(() => result.current);
+    expect(result.current.value).toEqual(4);
+    expect(result.current.isPass).toEqual(false);
+
+    rerender({ id: 3 });
+    act(() => {
+      result.current.verify(1);
+    });
+    // @ts-ignore
+    await waitForNextUpdate(() => result.current);
+    expect(result.current.value).toEqual(1);
+    expect(result.current.isPass).toEqual(true);
   });
 });

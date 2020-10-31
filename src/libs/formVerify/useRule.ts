@@ -1,7 +1,6 @@
 /**
- * the rule of form input
+ * the rule of form input for single rule
  * todo: 后续的版本可以考虑将校验和组件组合在一起，成为校验型高阶组件
- * todo: 自定义的rule函数支持promise格式
  */
 import { useState, useCallback, useMemo } from 'react';
 import Rules from '../../utils/verifyRules';
@@ -11,6 +10,7 @@ import { isBoolean } from 'lodash';
 
 interface Result {
   value: any;
+  isPass: boolean;
   verify: (newValue: any, options?: Options) => void;
 }
 
@@ -21,10 +21,11 @@ interface Options {
 
 function useRule(rule: any, initValue: any, isCleanWhenError = false, deps: Array<any> = []): Result {
   const [value, setValue] = useState(initValue || '');
+  const [isPass, setPass] = useState(false);
 
   const verifyRule = useMemo(() => {
     return getRuleFn({ rule, Rules, error });
-  }, []);
+  }, deps);
 
   const verify = useCallback((newValue: any, options: any) => {
     let effect: Options = {};
@@ -42,8 +43,10 @@ function useRule(rule: any, initValue: any, isCleanWhenError = false, deps: Arra
         if (result) {
           effect.success && effect.success();
           setValue(realVal);
+          setPass(true);
         } else {
           effect.fail && effect.fail();
+          setPass(false);
           if (isCleanWhenError) {
             setValue('');
           } else {
@@ -57,31 +60,19 @@ function useRule(rule: any, initValue: any, isCleanWhenError = false, deps: Arra
 
     const result = verifyRule(newValue);
     if (isPromise(result)) {
-      return result
+      result
         .then((d: any) => {
           reaction(d);
-          return d;
         })
-        .catch((e: any) => {
-          throw e;
+        .catch(() => {
+          reaction(false);
         });
     } else {
       reaction(result);
-      return result;
     }
-
-    // if (isType('boolean', isHideWhenError)) {
-    //   if (isHideWhenError || !realVal) {
-    //     setValue('');
-    //   } else {
-    //     setValue(realVal);
-    //   }
-    // } else {
-    //   setValue('');
-    // }
   }, deps);
 
-  return { value, verify };
+  return { value, verify, isPass };
 }
 
 export default useRule;
