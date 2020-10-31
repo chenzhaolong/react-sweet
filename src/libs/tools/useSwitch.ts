@@ -33,7 +33,6 @@ function useSwitch(style: Value, condition: any, deps: Array<any> = []): object 
         return {};
       }
     } else {
-      debugger;
       error('the second params of useStyle must be object or function');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

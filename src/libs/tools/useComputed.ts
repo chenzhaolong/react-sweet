@@ -1,6 +1,6 @@
 /**
  * @file get the value by computed from the deps
- * @todo: useComputed中，现阶段依赖跟踪只会一层结构有效，如果追踪依赖是多层对象，救火有问题，后续版本修复
+ * @todo: useComputed中，现阶段依赖跟踪只会一层结构有效，如果追踪依赖是多层对象，就会有问题，后续版本修复
  */
 import { useMemo, useRef, useCallback } from 'react';
 import { isType } from '../../utils/tools';
