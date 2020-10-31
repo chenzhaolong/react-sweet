@@ -21,7 +21,7 @@ interface Options {
 
 function useRule(rule: any, initValue: any, isCleanWhenError = false, deps: Array<any> = []): Result {
   const [value, setValue] = useState(initValue || '');
-  const [isPass, setPass] = useState(false);
+  const [isPass, setPass] = useState(true);
 
   const verifyRule = useMemo(() => {
     return getRuleFn({ rule, Rules, error });

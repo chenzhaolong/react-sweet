@@ -35,19 +35,25 @@ function CheckInput(props) {
   const obj6 = useRule((val) => {
     return !/[!@#$%]+/.test(val);
   }, 'obj6');
+
+  const [errorMsg, setError] = useState('error');
   return <div>
     {/* 数字 */}
     <input value={obj1.value} onChange={(e) => {
-      const a = obj1.verify(e.target.value, {
+      obj1.verify(e.target.value, {
         success() {
           console.log('success');
         },
         fail() {
-          console.log('fail');
+          if (!e.target.value) {
+            setError('require')
+          } else {
+            setError('出错了')
+          }
         }
       });
-      console.log('a', a);
     }} />
+    {obj1.isPass ? null : <div style={{color: 'red'}}>{errorMsg}</div>}
     <br />
     <input value={obj2.value} onChange={(e) => {
       // obj2.verify({val: e.target.value, min: 1, max: 10}, {
