@@ -5,9 +5,10 @@
 # Dependencies
 node_modules
 
-#ouput
-output
+#dist
+dist/
 
 #other
 example/node_modules
 example/react-sweet
+
