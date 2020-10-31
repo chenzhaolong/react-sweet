@@ -14,6 +14,7 @@ enum Status {
 interface Result {
   status: Status;
   data: any;
+  error: any;
 }
 
 function useAwait(callback: any, deps?: Array<any>): Result {
