@@ -5,7 +5,7 @@
      "jsx": "react",
      "declaration": true,
     "pretty": true,
-     "outDir": "./output",
+     "outDir": "./dist",
     "strict": true,
      "noUnusedLocals": true,
      "noUnusedParameters": true,
