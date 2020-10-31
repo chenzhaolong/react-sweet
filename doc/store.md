@@ -108,12 +108,12 @@ function AppleReducer(state, action) {
 ......
 ```
 
-2 . options: 配置对象
+2. options: 配置对象
 
 
 ```
 {
-  openAsync?: boolean;  // 是否开启起步，后续会说到，默认是false
+  openAsync?: boolean;  // 是否开启异步，后续会说到，默认是false
   plugins?: Array<Function>; // 支持中间件，中间件的格式后续会说到
   initState?: object; // state的初始值
   openCache?: boolean; // 是否采用内置的缓存中间件，起到性能优化，后续会说到，默认是false。
@@ -121,7 +121,7 @@ function AppleReducer(state, action) {
 }
 ```
 
-3 . 返回值：
+3. 返回值：
 
 
 ```
@@ -134,7 +134,7 @@ store = {
 
 getState中的path如果存在，会获取制定的path路径的值，如果拿不到就用defaultValue代替；如果没有path，则直接返回整个state；
 
-4 . openAsync：该配置项可以让dispatch具有处理异步能力
+4. openAsync：该配置项可以让dispatch具有处理异步能力
 
 openAsync为true时，action的格式可以为：
 
@@ -204,7 +204,7 @@ export function A3(props) {
 
 如果openAsync为false，则action为普通的对象
 
-5 . plugins：中间件，和redux的中间件的作用一样，但这里重新定义了中间件的书写格式，让开发者更便捷的开发合适的中间件；
+5. plugins：中间件，和redux的中间件的作用一样，但这里重新定义了中间件的书写格式，让开发者更便捷的开发合适的中间件；
 
 格式：
 
@@ -233,11 +233,11 @@ export function demoPlugins(globalState) {
 }
 ```
 
-6 . openCache：开启action缓存机制，如果同一个action，type和payload相同，则会认为该次dispatch没必要，会拦截dispatch，从而起到减少没必要的渲染的作用。
+6. openCache：开启action缓存机制，如果同一个action，type和payload相同，则会认为该次dispatch没必要，会拦截dispatch，从而起到减少没必要的渲染的作用。
 
    其原理是内部封装了一个缓存中间件，开启后会启用该中间件进行拦截操作。
 
-7 . openLog: 开始日志功能，他会在每次dispatch之后会打印出一条日志，日志内容包括dispatch前后的state。
+7. openLog: 开始日志功能，他会在每次dispatch之后会打印出一条日志，日志内容包括dispatch前后的state。
 
 - demo：
 
