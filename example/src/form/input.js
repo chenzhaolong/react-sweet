@@ -3,8 +3,9 @@
  */
 
 import React, {Component, useEffect, useState, useMemo} from 'react'
-import { useRule, useRules } from '../../react-sweet/src';
-import {isBoolean} from 'lodash'
+// import { useRule, useRules } from '../../react-sweet/src';
+import {useRule, useRules} from 'react-sweet';
+import { isBoolean } from 'lodash'
 
 export class Form extends Component {
   state = {
@@ -121,7 +122,7 @@ function CheckInputAll(props) {
               res(false)
             }
             res(!/[!@#$%]+/.test(val));
-          }, 1000)
+          }, 500)
         })
       }}
   });
@@ -174,7 +175,7 @@ function CheckInputAll(props) {
       verify('d', e.target.value, {
         fail() {
           console.log('end loading');
-          console.log('有特殊字符');
+          console.log('有特殊字符1');
           return false;
         }
       });

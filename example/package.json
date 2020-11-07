@@ -37,6 +37,7 @@
   "dependencies": {
     "element-react": "^1.4.34",
     "element-theme-default": "^1.4.13",
-    "eslint-plugin-react-hooks": "^4.0.5"
+    "eslint-plugin-react-hooks": "^4.0.5",
+    "react-sweet": "^1.0.2"
   }
 }
