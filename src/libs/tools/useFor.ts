@@ -1,14 +1,18 @@
 /**
  * @file render the list item
- * todo: 候选添加limit和limitRender等对渲染较多数据的性能进行优化
  */
-import { useMemo } from 'react';
+import { ReactElement, useMemo } from 'react';
 import { isArray, hasProperty } from '../../utils/tools';
 import { error } from '../../utils/log';
+
+type fn = () => number;
 
 interface ListOptions {
   render: (item: object, index?: number) => Array<any>;
   source: Array<any>;
+  container?: ReactElement;
+  itemHeight?: number | fn;
+  lazyRender?: (item: object, index?: number) => Array<any>;
 }
 
 function useFor(options: ListOptions): Array<any> {
