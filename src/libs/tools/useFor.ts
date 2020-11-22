@@ -4,6 +4,7 @@
 import { ReactElement, useMemo } from 'react';
 import { isArray, hasProperty } from '../../utils/tools';
 import { error } from '../../utils/log';
+import { isFunction } from 'lodash';
 
 type fn = () => number;
 
@@ -25,11 +26,18 @@ function useFor(options: ListOptions): Array<any> {
   if (!isArray(options.source)) {
     error('the property of source in useFor must be Array');
   }
-  const { render, source } = options;
+  const { render, source, lazyRender } = options;
+
   return useMemo(() => {
-    return source.map((item, index) => {
-      return render(item, index);
-    });
+    if (isFunction(lazyRender)) {
+      return source.map((item, index) => {
+        return lazyRender(item, index);
+      });
+    } else {
+      return source.map((item, index) => {
+        return render(item, index);
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [source]);
 }
